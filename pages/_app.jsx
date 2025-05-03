@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }) {
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  useEffect(() => {
+  /*useEffect(() => {
     // Assurez-vous que router.events est défini avant d'ajouter les événements
     if (router && router.events) {
       const handleRouteChangeStart = () => setLoading(true);
@@ -27,14 +27,9 @@ function MyApp({ Component, pageProps }) {
         router.events.off('routeChangeError', handleRouteChangeError);
       };
     }
-  }, [router]);
+  }, [router]);*/
   return (
     <AuthContextProvider>
-      {loading && (
-						<div className="overlay">
-							<div className="loader"></div>
-						</div>
-					)}
       <Component {...pageProps} />
     </AuthContextProvider>
   );

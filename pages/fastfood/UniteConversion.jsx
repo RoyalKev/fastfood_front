@@ -18,9 +18,9 @@ const UniteConversion = () => {
     const router = useRouter();
 
     //Pour la liste des produits
-    const [catproduits, setcatproduits] = useState([]);
-    const [produits, setproduits] = useState([]);
     const [categories, setcategories] = useState([]);
+    const [produits, setproduits] = useState([]);
+    const [boissons, setboissons] = useState([]);
     const [unitemesures, setunitemesures] = useState([]);
     const [error, setError] = useState(null);
     // Pagination states
@@ -29,11 +29,11 @@ const UniteConversion = () => {
 
     //const [catid, setcatid] = useState('')
 
-    const handleChange = async (e) => {
+    /*const handleChange = async (e) => {
         try {
             const response = await axios.get(`${StaticIP}api/categorie/produitcat/` + e.target.value);
             if (response.data.Status) {
-                setcatproduits(response.data.Result);
+                setcategories(response.data.Result);
                 setDataproduit((prev) => ({ ...prev, categorie_id: e.target.value }));
             } else {
                 setError("Erreur lors de la récupération des produits");
@@ -44,14 +44,34 @@ const UniteConversion = () => {
         } finally {
             setLoading(false);
         }
+    };*/
+
+    const fetchcategories = async (e) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${StaticIP}api/categorie/liste2`);
+            if (response.data.Status) {
+                setcategories(response.data.Result);
+            } else {
+                setError("Erreur lors de la récupération des catégories");
+            }
+        } catch (err) {
+            setError("Une erreur est survenue lors de la récupération des catégories");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
+    useEffect(() => {
+        fetchcategories(categories);
+    }, []);
 
 
     // Récupération des produits avec pagination
     const fetchproduits = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/uniteconversion/liste`);
+            const response = await axios.get(`${StaticIP}api/uniteconversion/liste?page=${page}&limit=10`);
             if (response.data.Status) {
                 setproduits(response.data.Result);
                 setTotalPages(response.data.Pagination.totalPages);
@@ -76,13 +96,13 @@ const UniteConversion = () => {
             setCurrentPage(page);
         }
     };
-    // Récupération des categories
-    const fetchcategories = async (e) => {
+    // Récupération des boissons
+    const fetchboissons = async (e) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/categorie/liste`);
+            const response = await axios.get(`${StaticIP}api/uniteconversion/listeboissons`);
             if (response.data.Status) {
-                setcategories(response.data.Result);
+                setboissons(response.data.Result);
             } else {
                 setError("Erreur lors de la récupération des catégories");
             }
@@ -94,7 +114,7 @@ const UniteConversion = () => {
         }
     };
     useEffect(() => {
-        fetchcategories(categories);
+        fetchboissons(boissons);
     }, []);
     //FIN LISTE
 
@@ -148,38 +168,38 @@ const UniteConversion = () => {
     const [image, setImage] = useState(null);
 
     const [dataproduit, setDataproduit] = useState({
-        a_produire:'',
         categorie_id: '',
-        produit_id: '',
+        categorie: '',
+        bouteilleMereid: '',
         designation: '',
         prix: '',
-        unite_id: '',
-        quantite_equivalente: '',
+        unite: '',
+        contenance: '',
         userid: null,
     })
 
     // Utilisez useEffect pour définir l'ID utilisateur une seule fois
     useEffect(() => {
-            if (currentUser) {
-                setuserId(currentUser.id);
-                setDataproduit((prev) => ({ ...prev, userid: currentUser.id }));
-            }
-        }, [currentUser]);
+        if (currentUser) {
+            setuserId(currentUser.id);
+            setDataproduit((prev) => ({ ...prev, userid: currentUser.id }));
+        }
+    }, [currentUser]);
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
         formData.append('userid', dataproduit.userid);
-        formData.append('a_produire', dataproduit.a_produire);
         formData.append('categorie_id', dataproduit.categorie_id);
-        formData.append('produit_id', dataproduit.produit_id);
+        formData.append('categorie', dataproduit.categorie);
+        formData.append('bouteilleMereid', dataproduit.bouteilleMereid);
         formData.append('designation', dataproduit.designation);
         formData.append('prix', dataproduit.prix);
-        formData.append('unite_id', dataproduit.unite_id);
-        formData.append('quantite_equivalente', dataproduit.quantite_equivalente);
+        formData.append('unite', dataproduit.unite);
+        formData.append('contenance', dataproduit.contenance);
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
-            if (image) formData.append('image', image);
+        if (image) formData.append('image', image);
 
         setLoading(true);
         try {
@@ -269,36 +289,59 @@ const UniteConversion = () => {
         }
     }
 
+    const handleViewCompo = (id) => {
+        router.push(`/fastfood/composition/${id}`); // Redirige vers la page Composition avec l'ID
+    };
+
+    const [showModalmouvement, setshowModalmouvement] = useState(false);
+    const [mouvement, setmouvement] = useState([]);
+    const handleShowmouvement = (id) => {
+        setshowModalmouvement(true)
+        axios.get(`${StaticIP}api/uniteconversion/mouvement/` + id)
+            .then(result => {
+                if (result.data.Status) {
+                    if (result.data.Status) {
+                        setmouvement(result.data.Result)
+                    } else {
+                        alert(result.data.Error)
+                    }
+                }
+            })
+    }
+
     //FIN MISE A JOUR
     return (
         <LayoutFastfood>
             <BreadCrumb titre="Produits convertis" />
             <div className="row g-3 mb-3">
-                <div className="col-xl-5 col-lg-5">
+                <div className="col-xl-12 col-lg-12">
                     <div className="sticky-lg-top">
                         <div className="card mb-3">
                             <CardTitle title="Nouveau" />
                             <div className="card-body">
                                 <form onSubmit={handleSubmit}>
                                     <div className="row g-3 align-items-center">
-                                    <div className="col-md-6">
-                                            <label className="form-label">Issu de production?<font color="red">*</font></label>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Type<font color="red">*</font></label>
                                             <select class="form-control"
-                                                name="a_produire"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, a_produire: e.target.value })}
+                                                name="categorie"
+                                                onChange={(e) => setDataproduit({ ...dataproduit, categorie: e.target.value })}
                                             >
                                                 <option value=""> Sélectionner</option>
-                                                <option value="Oui"> Oui</option>
-                                                <option value="Non"> Non</option>
-                                                
-
+                                                <option value="Plat"> Plat</option>
+                                                <option value="Boisson"> Boisson</option>
                                             </select>
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Catégorie<font color="red">*</font></label>
+                                        <div className="col-md-3">
+                                            <label className="form-label">Désignation</label>
+                                            <input class="form-control" name="designation" placeholder="Saisir la désignation"
+                                                onChange={(e) => setDataproduit({ ...dataproduit, designation: e.target.value })} />
+                                        </div>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Catégories</label>
                                             <select class="form-control"
                                                 name="categorie_id"
-                                                onChange={handleChange}
+                                                onChange={(e) => setDataproduit({ ...dataproduit, categorie_id: e.target.value })}
                                             >
                                                 <option value=""> Sélectionner</option>
                                                 {categories.map((categorie, index) => (
@@ -307,54 +350,60 @@ const UniteConversion = () => {
 
                                             </select>
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Produit</label>
-                                            <select class="form-control"
-                                                name="produit_id"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, produit_id: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                {catproduits.map((prod, index) => (
-                                                    <option value={prod.id} key={prod.id}> {prod.designation}</option>
-                                                ))}
 
-                                            </select>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Désignation</label>
-                                            <input class="form-control" name="designation" placeholder="Saisir la désignation"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, designation: e.target.value })}/>
-                                        </div>
-                                        <div className="col-md-6">
+                                        <div className="col-md-2">
                                             <label className="form-label">Prix <font color="red">*</font></label>
                                             <input class="form-control" name="prix" placeholder="Saisir le prix unit."
-                                                onChange={(e) => setDataproduit({ ...dataproduit, prix: e.target.value })}/>
+                                                onChange={(e) => setDataproduit({ ...dataproduit, prix: e.target.value })} />
                                         </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Unité de vente<font color="red">*</font></label>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Unité<font color="red">*</font></label>
                                             <select class="form-control"
-                                                name="unite_id"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, unite_id: e.target.value })}
+                                                name="unite"
+                                                onChange={(e) => setDataproduit({ ...dataproduit, unite: e.target.value })}
                                             >
                                                 <option value=""> Sélectionner</option>
-                                                {unitemesures.map((unitemesure, index) => (
-                                                    <option value={unitemesure.id} key={unitemesure.id}> {unitemesure.libelle}</option>
-                                                ))}
-
+                                                <option value="Plat"> Plat</option>
+                                                <option value="Bouteille"> Bouteille</option>
+                                                <option value="Verre"> Verre</option>
+                                                <option value="Unité"> Unité</option>
                                             </select>
                                         </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">Qté équivalente</label>
-                                            <input class="form-control" name="quantite_equivalente" placeholder="Saisir la quantité équivalente."
-                                                onChange={(e) => setDataproduit({ ...dataproduit, quantite_equivalente: e.target.value })}/>
-                                        </div>
+                                        {
+                                            dataproduit.categorie == "Boisson" && dataproduit.unite == "Verre" &&
+                                            <>
+                                                <div className="col-md-3">
+                                                    <label className="form-label">Comme enfant de</label>
+                                                    <select class="form-control"
+                                                        name="bouteilleMereid"
+                                                        onChange={(e) => setDataproduit({ ...dataproduit, bouteilleMereid: e.target.value })}
+                                                    >
+                                                        <option value=""> Sélectionner</option>
+                                                        {boissons.map((boisson, index) => (
+                                                            <option value={boisson.id} key={boisson.id}> {boisson.designation}</option>
+                                                        ))}
+
+                                                    </select>
+                                                </div>
+
+                                            </>
+                                        }
+                                        {
+                                            dataproduit.categorie == "Boisson" && dataproduit.unite == "Bouteille" &&
+                                            <div className="col-md-2">
+                                                <label className="form-label">Nbre de verre contenu  <font color="red">*</font></label>
+                                                <input class="form-control" name="contenance" placeholder="Ex : 5"
+                                                    onChange={(e) => setDataproduit({ ...dataproduit, contenance: e.target.value })} />
+                                            </div>
+                                        }
+
                                         <div className="col-md-8">
-                                        <label className="form-label">Uplaoder image<font color="red">*</font></label>
-                                        
-                                        <input type="file" class="form-control"
-                                            name="image"
-                                            onChange={(e) => setImage(e.target.files[0])}/>
-                                    </div>
+                                            <label className="form-label">Uploader image<font color="red">*</font></label>
+
+                                            <input type="file" class="form-control"
+                                                name="image"
+                                                onChange={(e) => setImage(e.target.files[0])} />
+                                        </div>
                                         <div className="col-md-12">
                                             <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
                                                 <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
@@ -368,7 +417,7 @@ const UniteConversion = () => {
                     <ToastContainer />
                 </div>
 
-                <div class="col-xl-7 col-lg-7">
+                <div class="col-xl-12 col-lg-12">
                     <div class="card">
                         <CardTitle title="Liste" />
                         <div class="card-body">
@@ -379,11 +428,11 @@ const UniteConversion = () => {
                                     <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width: '100%' }}>
                                         <thead>
                                             <tr>
-                                                <th>Catégorie </th>
+                                                <th>Type </th>
                                                 <th>Désignation </th>
                                                 <th>Prix </th>
                                                 <th>Unité </th>
-                                                <th>Quantité équiv. </th>
+                                                <th>Stock disponible </th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -391,12 +440,19 @@ const UniteConversion = () => {
                                             {produits.map((produit, index) => (
                                                 <tr key={produit.id}>
                                                     <td>
-                                                        {produit.libelle}
+                                                        {produit.type}
                                                     </td>
                                                     <td>{produit.designation}</td>
                                                     <td>{produit.prix}</td>
-                                                    <td><span className='badge bg-success'>{produit.ulibelle}</span></td>
-                                                    <td>{produit.quantite_equivalente}</td>
+                                                    <td><span className='badge bg-info'>{produit.unite}</span></td>
+                                                    <td style={{fontSize:'15px'}}>
+                                                        {
+                                                            produit.type=="Boisson" &&
+                                                            <span className='badge bg-success'>{produit.stock}</span>
+                                                            
+                                                        }
+                                                        
+                                                    </td>
                                                     <td>
                                                         <button className="btn btn-outline-info btn-sm">
                                                             <i className='icofont-edit'></i>
@@ -404,10 +460,8 @@ const UniteConversion = () => {
                                                         <button className="btn btn-outline-warning btn-sm"
                                                             title="Détails"
                                                             onClick={() => handleShowproduit(produit.id)}>
-                                                            <i className='icofont-eye' style={{color:"#cfa108"}}></i>
+                                                            <i className='icofont-eye' style={{ color: "#cfa108" }}></i>
                                                         </button>
-                                                        
-                                                        
                                                         <button className="btn btn-outline-danger btn-sm"
                                                             title="Supprimer"
                                                             onClick={() => {
@@ -416,6 +470,27 @@ const UniteConversion = () => {
                                                             }}>
                                                             <i className='icofont-trash'></i>
                                                         </button>
+                                                        {
+                                                            produit.type == "Plat" &&
+                                                            <>
+                                                                <button type="button" className="btn btn-outline-info btn-sm" title="Composition"
+                                                                    onClick={() => handleViewCompo(produit.id)}>
+                                                                    <i className="icofont-files-stack"></i>
+                                                                </button>
+                                                            </>
+                                                        }
+                                                        {
+                                                            produit.type == "Boisson" &&
+                                                            <>
+
+                                                                <button className="btn btn-primary btn-sm"
+                                                                    title="Mouvements"
+                                                                    onClick={() => handleShowmouvement(produit.id)}>
+                                                                    <i className='icofont-eye' style={{ color: "#000" }}></i>
+                                                                </button>
+                                                            </>
+                                                        }
+
                                                     </td>
                                                 </tr>
                                             ))}
@@ -483,20 +558,65 @@ const UniteConversion = () => {
                                                 value={produitdetail.unite}
                                             />
                                         </div>
-                                        <div className="col-md-12 mb-3">
+                                        <div className="col-md-6 mb-3">
                                             <label className="form-label">Prix</label>
                                             <input type="text" class="form-control"
                                                 name="prix"
                                                 value={produitdetail.prix}
                                             />
                                         </div>
-                                        
-                                        
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label">Stock</label>
+                                            <input type="text" class="form-control"
+                                                value={produitdetail.stock}
+                                            />
+                                        </div>
                                         
                                     </div>
                                 </Modal.Body>
                                 <Modal.Footer>
+
                                     <Button variant="danger" onClick={() => setShowModalproduit(false)}>
+                                        <i className="icofont-close"></i> Fermer
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+                            {/* Lignes ou detail appro */}
+                            <Modal show={showModalmouvement} tabIndex='-1' size='lg' scrollable>
+                                <Modal.Header>
+                                    <Modal.Title style={{ fontSize: '13px', fontWeight: '700', textAlign: 'center' }}>
+                                        Mouvements du produit
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body key={mouvement.id} scrollable>
+
+                                    <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width: '100%' }}>
+                                        <thead>
+                                            <tr>
+                                                <th>Date </th>
+                                                <th>Quantité </th>
+                                                <th>Mouvement </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                mouvement.length > 0 ?
+                                                mouvement.map((mouvement, index) => (
+                                                <tr key={mouvement.id}>
+                                                    <td>{new Date(mouvement.date).toLocaleString()}</td>
+                                                    <td>{mouvement.quantite}</td>
+                                                    <td>{mouvement.type_operation}</td>
+                                                </tr> 
+                                                )):
+                                                <p>
+                                                    Aucune ligne trouvée
+                                                </p>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="danger" onClick={() => setshowModalmouvement(false)}>
                                         <i className="icofont-close"></i> Fermer
                                     </Button>
                                 </Modal.Footer>
@@ -507,11 +627,6 @@ const UniteConversion = () => {
                 </div>
 
             </div>
-            {loading && (
-                <div className="overlay">
-                    <div className="loader"></div>
-                </div>
-            )}
         </LayoutFastfood>
     )
 }

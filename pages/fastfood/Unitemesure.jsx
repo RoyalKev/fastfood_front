@@ -246,11 +246,6 @@ const Unitemesure = () => {
                 </div>
                 
             </div>
-            {loading && (
-						<div className="overlay">
-							<div className="loader"></div>
-						</div>
-					)}
         </LayoutFastfood>
     )
 }

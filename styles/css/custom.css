@@ -33,3 +33,20 @@
 .btn .btn-white:active{
   color: red;
 }
+
+.sticky-sidebar {
+  position: sticky;
+  top: 0;
+  border-right: 2px solid #ddd;
+  padding: 10px;
+  height: 100vh; /* Pour qu'il prenne toute la hauteur */
+  overflow-y: auto; /* Ajoute un scroll si la liste est longue */
+}
+
+.sticky-sidebar-panier {
+  position: sticky;
+  top: 10px;
+  z-index: 10; /* si besoin, pour rester au-dessus */
+  padding: 10px;
+  overflow-y: auto;
+}

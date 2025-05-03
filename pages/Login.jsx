@@ -56,7 +56,7 @@ const Login = () => {
 											<i class="bi bi-bag-check-fill  text-primary" style={{ fontSize:'90px' }}></i>
 										</div>
 										<div class="mb-5">
-											<h2 class="color-900 text-center" style={{ color:"#fff", fontSize:'40px' }}>Module Fast Food</h2>
+											<h2 class="color-900 text-center" style={{ color:"#fff", fontSize:'30px' }}>Module <br/>Restaurant /Fast Food</h2>
 											<span style={{ color:"#fff" }}>Simplifiez et gérez facilement votre stock, vos ventes etc.</span>
 										</div>
 										<div style={{ marginLeft:"-45px", marginTop:'-35px' }}>

@@ -1,18 +1,6 @@
 import {React, useState, useEffect }  from 'react'
 import Header from './Header'
 import Topbar from './Topbar'
-import '@/styles/css/animation.css';
-import '@/styles/css/bootstrap.min.css';
-import '@/styles/css/dropzone.min.css';
-import '@/styles/css/flatpickr.min.css';
-import '@/styles/css/slick.css';
-import '@/styles/css/slick-theme.css';
-import '@/styles/css/rangeSlider.min.css';
-import '@/styles/css/select2.min.css';
-import '@/styles/css/prism.css';
-import '@/styles/css/fontawesome.css';
-import '@/styles/css/bootstrap-icons.css';
-import '@/styles/css/style.css';
 import Sidebarvendeur from './SidebarRh';
 import Loader from './Loader';
 import { useRouter } from 'next/router';

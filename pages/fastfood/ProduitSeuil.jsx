@@ -13,7 +13,7 @@ import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
 
-const Produit = () => {
+const ProduitSeuil = () => {
 
     const router = useRouter();
 
@@ -27,17 +27,11 @@ const Produit = () => {
     const [totalPages, setTotalPages] = useState(1);
 
     // Récupération des produits avec pagination
-    const fetchproduits = async (page = 1) => {
+    const fetchproduits = async (e) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/produit/liste?page=${page}&limit=5`);
-            if (response.data.Status) {
-                setproduits(response.data.Result);
-                setTotalPages(response.data.Pagination.totalPages);
-                setCurrentPage(response.data.Pagination.currentPage);
-            } else {
-                setError("Erreur lors de la récupération des produits");
-            }
+            const response = await axios.get(`${StaticIP}api/produit/produits-seuil`);
+                setproduits(response.data);
         } catch (err) {
             setError("Une erreur est survenue lors de la récupération des produits");
             console.error(err);
@@ -47,57 +41,14 @@ const Produit = () => {
     };
 
     useEffect(() => {
-        fetchproduits(currentPage);
-    }, [currentPage]);
+        fetchproduits(produits);
+    }, []);
 
     const goToPage = (page) => {
         if (page > 0 && page <= totalPages) {
             setCurrentPage(page);
         }
     };
-    // Récupération des categories
-    const fetchcategories = async (e) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${StaticIP}api/categorie/liste`);
-            if (response.data.Status) {
-                setcategories(response.data.Result);
-            } else {
-                setError("Erreur lors de la récupération des catégories");
-            }
-        } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des catégories");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-    useEffect(() => {
-        fetchcategories(categories);
-    }, []);
-    //FIN LISTE
-
-    // Récupération des unités de mesures
-    const fetchunitemesures = async (e) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${StaticIP}api/unitemesure/liste`);
-            if (response.data.Status) {
-                setunitemesures(response.data.Result);
-            } else {
-                setError("Erreur lors de la récupération des unités de mesure");
-            }
-        } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des unités de mesure");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-    useEffect(() => {
-        fetchunitemesures(unitemesures);
-    }, []);
-    //FIN LISTE
 
     //POUR LA SUPPRESSION
     const [showModal, setShowModal] = useState(false);
@@ -143,52 +94,7 @@ const Produit = () => {
             setDataproduit((prev) => ({ ...prev, userid: currentUser.id }));
         }
     }, [currentUser]);
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('userid', dataproduit.userid);
-        formData.append('designation', dataproduit.designation);
-        formData.append('unite', dataproduit.unite);
-        formData.append('seuil', dataproduit.seuil);
-        formData.append('stock_bloquant', dataproduit.stock_bloquant);
-        formData.append('puisable_en_portion', dataproduit.puisable_en_portion);
-        formData.append('contenance', dataproduit.contenance);
-        /*for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }*/
-        if (image) formData.append('image', image);
-
-        setLoading(true);
-        try {
-            const response = await axios.post(`${StaticIP}api/produit/nouveau`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-            console.log('la réggg :', response.data)
-            if (response.data.Status) {
-                toast.success('Produit créée avec succès !');
-                fetchproduits();
-                //dataproduit({});
-                /*setTimeout(() => {
-                    setLoading(false);
-                    //window.location.reload(); // Rechargement de la page
-                    //router.push('/NouveauBoutique');
-                }, 2000);*/
-            } else {
-                toast.error(response.data.Error);
-                setLoading(false);
-            }
-        } catch (err) {
-            setLoading(false);
-            console.log(err)
-            if (err.response && err.response.data) {
-                // Si l'erreur est liée à un type de fichier non supporté
-                toast.error(err.response.data.message || 'Erreur lors de la création du produit');
-            } else {
-                console.log(err)
-                toast.error('Une erreur est survenue');
-            }
-        }
-    };
+    
     //POUR LA RECUPERATION DUNE produit
     const [deletedId, setDeletedId] = useState("")
     const [showModalproduit, setShowModalproduit] = useState(false);
@@ -326,107 +232,8 @@ const Produit = () => {
     //FIN MISE A JOUR
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="Produits" />
+            <BreadCrumb titre="Produits au seuil de stock" />
             <div className="row g-3 mb-3">
-                <div className="col-xl-12 col-lg-12">
-                    <div className="sticky-lg-top">
-                        <div className="card mb-3">
-                            <CardTitle title="Nouveau" />
-                            <div className="card-body">
-                                <form onSubmit={handleSubmit}>
-                                    <div className="row g-3 align-items-center">
-                                        <div className="col-md-5">
-                                            <label className="form-label">Désignation <font color="red">*</font></label>
-                                            <input class="form-control" name="designation" placeholder="Saisir la désignation"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, designation: e.target.value })} />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">Unité<font color="red">*</font></label>
-                                            <select class="form-control"
-                                                name="unite"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, unite: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                <option value="Unité"> Unité</option>
-                                                <option value="Sac"> Sac</option>
-                                                <option value="Franc"> Franc</option>
-
-
-                                            </select>
-                                        </div>
-                                        <div className="col-md-6" hidden>
-                                            <label className="form-label">Prix <font color="red">*</font></label>
-                                            <input class="form-control" name="prix" placeholder="Saisir le prix unit."
-                                                onChange={(e) => setDataproduit({ ...dataproduit, prix: e.target.value })} />
-                                        </div>
-                                        <div className="col-md-6" hidden>
-                                            <label className="form-label">Unité d'appro<font color="red">*</font></label>
-                                            <select class="form-control"
-                                                name="unite1"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, unite1: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                {unitemesures.map((unitemesure, index) => (
-                                                    <option value={unitemesure.id} key={unitemesure.id}> {unitemesure.libelle}</option>
-                                                ))}
-
-                                            </select>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="form-label">Seuil <font color="red">*</font></label>
-                                            <input class="form-control" name="seuil" placeholder="Saisir le seuil"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, seuil: e.target.value })} />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">Stock bloquant?<font color="red">*</font></label>
-                                            <select class="form-control"
-                                                name="stock_bloquant"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, stock_bloquant: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                <option value="Non"> Non</option>
-                                                <option value="Oui"> Oui</option>
-                                            </select>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="form-label">Décomposable ?<font color="red">*</font></label>
-                                            <select class="form-control"
-                                                name="puisable_en_portion"
-                                                onChange={(e) => setDataproduit({ ...dataproduit, puisable_en_portion: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                <option value="Non"> Non</option>
-                                                <option value="Oui"> Oui</option>
-                                            </select>
-                                        </div>
-                                        {
-                                            dataproduit.puisable_en_portion == "Oui" &&
-                                            <div className="col-md-3">
-                                                <label className="form-label">Contenance <font color="red">*</font></label>
-                                                <input class="form-control" name="contenance" placeholder="Saisir la quantité contenu en portion."
-                                                    onChange={(e) => setDataproduit({ ...dataproduit, contenance: e.target.value })} />
-                                            </div>
-                                        }
-
-                                        <div className="col-md-6" hidden>
-                                            <label className="form-label">Qté Contenue dans embal. <font color="red">*</font></label>
-                                            <input class="form-control" name="contenu" placeholder="Saisir la quantité contenu."
-                                                onChange={(e) => setDataproduit({ ...dataproduit, contenu: e.target.value })} />
-                                        </div>
-
-                                        <div className="col-md-12">
-                                            <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
-                                                <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <ToastContainer />
-                </div>
-
                 <div class="col-xl-12 col-lg-12">
                     <div class="card">
                         <CardTitle title="Liste" />
@@ -439,14 +246,8 @@ const Produit = () => {
                                         <thead>
                                             <tr>
                                                 <th>Désignation </th>
-                                                <th>Seuil </th>
-                                                <th>Stock bloquant? </th>
-                                                <th>Puisable en portion? </th>
-                                                <th>Contenance </th>
-                                                <th hidden>Prix </th>
-                                                <th hidden>Unité </th>
-                                                <th hidden>Contenu </th>
-                                                <th>Stock </th>
+                                                <th style={{ textAlign:'center' }}>Seuil </th>
+                                                <th style={{ textAlign:'center' }}>Stock </th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -461,26 +262,19 @@ const Produit = () => {
                                                 return (
                                                     <tr key={produit.id}>
                                                         <td>{produit.designation}</td>
-                                                        <td style={{ textAlign: 'center' }}>{produit.seuil}</td>
-                                                        <td style={{ textAlign: 'center' }}>{produit.stock_bloquant}</td>
-                                                        <td style={{ textAlign: 'center' }}>{produit.puisable_en_portion}</td>
                                                         <td style={{ textAlign: 'center' }}>
-                                                            {produit.puisable_en_portion === "Oui" && produit.contenance}
+                                                            <span className='badge bg-success'>{produit.seuil}</span>
                                                         </td>
-                                                        <td hidden>{produit.prix}</td>
-                                                        <td hidden>{produit.ulibelle}</td>
-                                                        <td hidden>{produit.contenu}</td>
                                                         <td style={{ fontSize: '16px', textAlign: 'center' }}>
                                                             {
                                                                 produit.puisable_en_portion == "Oui" &&
-                                                                <span className='badge bg-success'>
+                                                                <span className='badge bg-danger'>
                                                                     {affichageStock}
                                                                 </span>
-
                                                             }
                                                             {
                                                                 produit.stock_bloquant == "Oui" && produit.puisable_en_portion == "Non" &&
-                                                                <span className='badge bg-success'>
+                                                                <span className='badge bg-danger'>
                                                                     {stock.toLocaleString()}
                                                                 </span>
 
@@ -519,25 +313,7 @@ const Produit = () => {
                                             })}
                                         </tbody>
                                     </table>
-                                    <div style={{ marginTop: "20px", textAlign: "center" }}>
-                                        <button
-                                            onClick={() => goToPage(currentPage - 1)}
-                                            disabled={currentPage === 1}
-                                            style={{ marginRight: "10px" }}
-                                            className="btn btn-warning btn-sm"
-                                        >
-                                            <span aria-hidden="true">&laquo;</span> Précédent
-                                        </button>
-                                        <span>Page {currentPage} sur {totalPages}</span>
-                                        <button
-                                            onClick={() => goToPage(currentPage + 1)}
-                                            disabled={currentPage === totalPages}
-                                            style={{ marginLeft: "10px" }}
-                                            className="btn btn-warning btn-sm"
-                                        >
-                                            Suivant <span aria-hidden="true">&raquo;</span>
-                                        </button>
-                                    </div>
+                                    
                                 </>
                             )}
                             {/* Modal de confirmation */}
@@ -792,4 +568,4 @@ const Produit = () => {
     )
 }
 
-export default Produit
+export default ProduitSeuil

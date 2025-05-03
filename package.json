@@ -13,16 +13,20 @@
     "@ckeditor/ckeditor5-react": "^9.4.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
-    "chart.js": "^4.4.7",
+    "chart.js": "^4.4.8",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.2",
     "jspdf": "^2.5.2",
+    "jspdf-autotable": "^5.0.2",
     "next": "15.1.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.7",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
-    "react-toastify": "^11.0.0"
+    "react-toastify": "^11.0.0",
+    "recharts": "^2.15.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

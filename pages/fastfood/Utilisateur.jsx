@@ -9,33 +9,36 @@ import React, { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Modal, Button } from "react-bootstrap";
+import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
+import LayoutFastfood from '@/components/LayoutFastfood';
 
-const Banque = () => {
+const Utilisateur = () => {
 
     const router = useRouter();
 
-    //Pour la liste des banques
-    const [banques, setbanques] = useState([]);
+    //Pour la liste des utilisateurs
+    const [utilisateurs, setutilisateurs] = useState([]);
+    const [directions, setdirections] = useState([]);
     const [error, setError] = useState(null);
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    // Récupération des banques avec pagination
-    const fetchbanques = async (page = 1) => {
+    // Récupération des utilisateurs avec pagination
+    const fetchutilisateurs = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/banque/liste?page=${page}&limit=5`);
+            const response = await axios.get(`${StaticIP}api/auth/liste`);
             if (response.data.Status) {
-                setbanques(response.data.Result);
+                setutilisateurs(response.data.Result);
                 setTotalPages(response.data.Pagination.totalPages);
                 setCurrentPage(response.data.Pagination.currentPage);
             } else {
-                setError("Erreur lors de la récupération des banques");
+                setError("Erreur lors de la récupération des utilisateurs");
             }
         } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des banques");
+            setError("Une erreur est survenue lors de la récupération des utilisateurs");
             console.error(err);
         } finally {
             setLoading(false);
@@ -43,7 +46,7 @@ const Banque = () => {
     };
 
     useEffect(() => {
-        fetchbanques(currentPage);
+        fetchutilisateurs(currentPage);
     }, [currentPage]);
 
     const goToPage = (page) => {
@@ -51,25 +54,46 @@ const Banque = () => {
             setCurrentPage(page);
         }
     };
+    // Récupération des directions
+    const fetchdirections = async (e) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${StaticIP}api/direction/liste`);
+            if (response.data.Status) {
+                setdirections(response.data.Result);
+            } else {
+                setError("Erreur lors de la récupération des directions");
+            }
+        } catch (err) {
+            setError("Une erreur est survenue lors de la récupération des directions");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchdirections(directions);
+    }, []);
     //FIN LISTE
 
     //POUR LA SUPPRESSION
     const [showModal, setShowModal] = useState(false);
-    const [selectedBanque, setselectedBanque] = useState(null);
+    const [selectedUtilisateur, setselectedUtilisateur] = useState(null);
     const handleDelete = async () => {
-        if (!selectedBanque) return;
+        if (!selectedUtilisateur) return;
         try {
-            const response = await axios.delete(`${StaticIP}api/banque/supprimer/${selectedBanque.id}`);
+            const response = await axios.delete(`${StaticIP}api/auth/supprimer/${selectedUtilisateur.id}`);
             if (response.data.Status) {
-                setbanques(banques.filter((banq) => banq.id !== selectedBanque.id));
+                setutilisateurs(utilisateurs.filter((user) => user.id !== selectedUtilisateur.id));
                 setShowModal(false);
-                toast.success("Banque supprimée avec succès !");
+                toast.success("Utilisateur supprimé avec succès !");
             } else {
-                alert("Erreur : " + response.data.message);
+                toast.error("Erreur : " + response.data.message);
             }
         } catch (err) {
-            console.error("Erreur lors de la suppression :", err);
-            alert("Une erreur est survenue lors de la suppression.");
+            setShowModal(false);
+            console.error("Erreur lors de la suppression :", err.response.data.message);
+            toast.error("Suppression impossible, cet utilisateur est lié à certaines données");
         }
     };
     //FIN SUPPRESSION
@@ -78,8 +102,11 @@ const Banque = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
-    const [dataBanque, setDataBanque] = useState({
+    const [dataUtilisateur, setDataUtilisateur] = useState({
         nom: '',
+        email: '',
+        role: '',
+        password: 123456,
         userid: null,
     })
 
@@ -87,15 +114,18 @@ const Banque = () => {
     useEffect(() => {
         if (currentUser) {
             setuserId(currentUser.id);
-            setDataBanque((prev) => ({ ...prev, userid: currentUser.id }));
+            setDataUtilisateur((prev) => ({ ...prev, userid: currentUser.id }));
         }
     }, [currentUser]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('userid', dataBanque.userid);
-        formData.append('nom', dataBanque.nom);
+        formData.append('userid', dataUtilisateur.userid);
+        formData.append('password', dataUtilisateur.password);
+        formData.append('nom', dataUtilisateur.nom);
+        formData.append('email', dataUtilisateur.email);
+        formData.append('role', dataUtilisateur.role);
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
@@ -103,10 +133,10 @@ const Banque = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post('${StaticIP}api/banque/nouveau', formData);
+            const response = await axios.post(`${StaticIP}api/auth/nouveau`, formData);
             console.log('la réggg :', response.data)
             if (response.data.Status) {
-                toast.success('Banque créée avec succès !');
+                toast.success('Utilisateur crée avec succès !');
                 setTimeout(() => {
                     setLoading(false);
                     window.location.reload(); // Rechargement de la page
@@ -121,7 +151,7 @@ const Banque = () => {
             console.log(err)
             if (err.response && err.response.data) {
                 // Si l'erreur est liée à un type de fichier non supporté
-                toast.error(err.response.data.message || 'Erreur lors de la création de la banque');
+                toast.error(err.response.data.message || 'Erreur lors de la création de l\'utilisateur');
             } else {
                 console.log(err)
                 toast.error('Une erreur est survenue');
@@ -129,8 +159,8 @@ const Banque = () => {
         }
     };
     return (
-        <Layout>
-            <BreadCrumb titre="Banques" />
+        <LayoutFastfood>
+            <BreadCrumb titre="utilisateurs" />
             <div className="row g-3 mb-3">
                 <div className="col-xl-4 col-lg-4">
                     <div className="sticky-lg-top">
@@ -140,16 +170,36 @@ const Banque = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="row g-3 align-items-center">
                                     <div className="col-md-12">
-                                        <label className="form-label">Nom de la banque</label>
+                                        <label className="form-label">Nom & Prénoms</label>
                                         <input type="text" class="form-control"
                                             name="nom"
-                                            onChange={(e) => setDataBanque({ ...dataBanque, nom: e.target.value })}
-                                            placeholder="Saisir le nom de la banque"
+                                            onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, nom: e.target.value })}
+                                            placeholder="Saisir le nom de la direction"
                                         />
                                     </div>
                                     <div className="col-md-12">
+                                        <label className="form-label">Email</label>
+                                        <input type="text" class="form-control"
+                                            name="email"
+                                            onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, email: e.target.value })}
+                                            placeholder="Saisir le nom de la direction"
+                                        />
+                                    </div>
+                                    <div className="col-md-12">
+                                            <label className="form-label">Roles <font color="red">*</font></label>
+                                            <select class="form-control"
+                                                name="role"
+                                                onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, role: e.target.value })}
+                                            >
+                                                <option value=""> Sélectionner</option>
+                                                <option value="User"> User</option>
+                                                <option value="Admin"> Admin</option>
+
+                                            </select>
+                                        </div>
+                                    <div className="col-md-12">
                                         <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
-                                            <i className='icofont-save'></i> {loading ? 'Connexion en cours...' : 'Enregistrer'}
+                                            <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
                                         </button>
                                     </div>
                                 </div>
@@ -164,23 +214,27 @@ const Banque = () => {
                     <div class="card">
                     <CardTitle title="Liste" />
                         <div class="card-body">
-                                        {banques.length === 0 ? (
-                                                <p>Aucune banque trouvée.</p>
+                                        {utilisateurs.length === 0 ? (
+                                                <p>Aucun utilisateur trouvé.</p>
                                             ) : (
                                                 <>
                                             <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width:'100%'}}>
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
-                                                        <th>Nom banque</th>
+                                                        <th>Nom </th>
+                                                        <th>Email </th>
+                                                        <th>Role </th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                {banques.map((Banque, index) => (
-                                                    <tr key={Banque.id}>
+                                                {utilisateurs.map((user, index) => (
+                                                    <tr key={user.id}>
                                                         <td>{index +1}</td>
-                                                        <td>{Banque.nom_banque}</td>
+                                                        <td>{user.nom}</td>
+                                                        <td>{user.email}</td>
+                                                        <td>{user.role}</td>
                                                         <td>
                                                             <button className="btn btn-outline-info btn-sm">
                                                                 <i className='icofont-edit'></i>
@@ -188,7 +242,7 @@ const Banque = () => {
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {
-                                                                    setselectedBanque(Banque);
+                                                                    setselectedUtilisateur(user);
                                                                     setShowModal(true);
                                                                 }}>
                                                                 <i className='icofont-trash'></i>
@@ -226,7 +280,7 @@ const Banque = () => {
                                                     <Modal.Title>Confirmation</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
-                                                    Êtes-vous sûr de vouloir supprimer la banque : <strong>{selectedBanque?.nom_banque}</strong> ?
+                                                    Êtes-vous sûr de vouloir supprimer l'utilisateur : <strong>{selectedUtilisateur?.nom}</strong> ?
                                                 </Modal.Body>
                                                 <Modal.Footer>
                                                     <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -241,16 +295,15 @@ const Banque = () => {
 
                     </div>
                 </div>
-                {loading && (
+                
+            </div>
+            {loading && (
 						<div className="overlay">
 							<div className="loader"></div>
 						</div>
 					)}
-            </div>
-
-
-        </Layout>
+        </LayoutFastfood>
     )
 }
 
-export default Banque
+export default Utilisateur

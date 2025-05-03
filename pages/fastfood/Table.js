@@ -9,34 +9,34 @@ import React, { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Modal, Button } from "react-bootstrap";
-import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
+import LayoutFastfood from '@/components/LayoutFastfood';
 
-const Salle = () => {
+const Table = () => {
 
     const router = useRouter();
 
-    //Pour la liste des salles
-    const [salles, setsalles] = useState([]);
+    //Pour la liste des tables
+    const [tables, settables] = useState([]);
     const [error, setError] = useState(null);
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); 
 
-    // Récupération des salles avec pagination
-    const fetchsalles = async (page = 1) => {
+    // Récupération des tables avec pagination
+    const fetchtables = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/salle/liste?page=${page}&limit=5`);
+            const response = await axios.get(`${StaticIP}api/table/liste?page=${page}&limit=5`);
             if (response.data.Status) {
-                setsalles(response.data.Result);
+                settables(response.data.Result);
                 setTotalPages(response.data.Pagination.totalPages);
                 setCurrentPage(response.data.Pagination.currentPage);
             } else {
-                setError("Erreur lors de la récupération des salles");
+                setError("Erreur lors de la récupération des tables");
             }
         } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des salles");
+            setError("Une erreur est survenue lors de la récupération des tables");
             console.error(err);
         } finally {
             setLoading(false);
@@ -44,7 +44,7 @@ const Salle = () => {
     };
 
     useEffect(() => {
-        fetchsalles(currentPage);
+        fetchtables(currentPage);
     }, [currentPage]);
 
     const goToPage = (page) => {
@@ -56,21 +56,21 @@ const Salle = () => {
 
     //POUR LA SUPPRESSION
     const [showModal, setShowModal] = useState(false);
-    const [selectedSalle, setselectedSalle] = useState(null);
+    const [selectedtable, setselectedtable] = useState(null);
     const handleDelete = async () => {
-        if (!selectedSalle) return;
+        if (!selectedtable) return;
         try {
-            const response = await axios.delete(`${StaticIP}api/salle/supprimer/${selectedSalle.id}`);
+            const response = await axios.delete(`${StaticIP}api/table/supprimer/${selectedtable.id}`);
             if (response.data.Status) {
-                setsalles(salles.filter((dep) => dep.id !== selectedSalle.id));
+                settables(tables.filter((dep) => dep.id !== selectedtable.id));
                 setShowModal(false);
-                toast.success("Salle supprimée avec succès !");
+                toast.success("table supprimée avec succès !");
             } else {
                 alert("Erreur : " + response.data.message);
             }
         } catch (err) {
             console.error("Erreur lors de la suppression :", err);
-            alert("Une erreur est survenue lors de la suppression.");
+            alert("Une erreur est survenue lors de la suppression."); 
         }
     };
     //FIN SUPPRESSION
@@ -79,8 +79,9 @@ const Salle = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
-    const [dataSalle, setDataSalle] = useState({
-        nom: '',
+    const [datatable, setDatatable] = useState({
+        reference: '',
+        emplacement: '',
         userid: null,
     })
 
@@ -88,15 +89,16 @@ const Salle = () => {
     useEffect(() => {
         if (currentUser) {
             setuserId(currentUser.id);
-            setDataSalle((prev) => ({ ...prev, userid: currentUser.id }));
+            setDatatable((prev) => ({ ...prev, userid: currentUser.id }));
         }
     }, [currentUser]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('userid', dataSalle.userid);
-        formData.append('nom', dataSalle.nom);
+        formData.append('userid', datatable.userid);
+        formData.append('reference', datatable.reference);
+        formData.append('emplacement', datatable.emplacement);
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
@@ -104,10 +106,10 @@ const Salle = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${StaticIP}api/salle/nouveau`, formData);
+            const response = await axios.post(`${StaticIP}api/table/nouveau`, formData);
             console.log('la réggg :', response.data)
             if (response.data.Status) {
-                toast.success('Salle créée avec succès !');
+                toast.success('Table créée avec succès !');
                 setTimeout(() => {
                     setLoading(false);
                     window.location.reload(); // Rechargement de la page
@@ -122,7 +124,7 @@ const Salle = () => {
             console.log(err)
             if (err.response && err.response.data) {
                 // Si l'erreur est liée à un type de fichier non supporté
-                toast.error(err.response.data.message || 'Erreur lors de la création de la direction');
+                toast.error(err.response.data.message || 'Erreur lors de la création de la table');
             } else {
                 console.log(err)
                 toast.error('Une erreur est survenue');
@@ -130,8 +132,8 @@ const Salle = () => {
         }
     };
     return (
-        <LayoutMeeting>
-            <BreadCrumb titre="salles de réunion" />
+        <LayoutFastfood>
+            <BreadCrumb titre="tables" />
             <div className="row g-3 mb-3">
                 <div className="col-xl-4 col-lg-4">
                     <div className="sticky-lg-top">
@@ -141,13 +143,24 @@ const Salle = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="row g-3 align-items-center">
                                     <div className="col-md-12">
-                                        <label className="form-label">Numéro/ Nom de la salle</label>
+                                        <label className="form-label">Référence de la table<font color="red">*</font></label>
                                         <input type="text" class="form-control"
-                                            name="nom"
-                                            onChange={(e) => setDataSalle({ ...dataSalle, nom: e.target.value })}
-                                            placeholder="Saisir le nom de la direction"
+                                            name="reference"
+                                            onChange={(e) => setDatatable({ ...datatable, reference: e.target.value })}
+                                            placeholder="Saisir le reference de la table"
                                         />
                                     </div>
+                                    <div className="col-md-12">
+                                            <label className="form-label">Emplacement<font color="red">*</font></label>
+                                            <select class="form-control"
+                                                name="emplacement"
+                                                onChange={(e) => setDatatable({ ...datatable, emplacement: e.target.value })}
+                                            >
+                                                <option value=""> Sélectionner</option>
+                                                <option value="Intérieur"> Intérieur</option>
+                                                <option value="Extérieur"> Extérieur</option>
+                                            </select>
+                                        </div>
                                     <div className="col-md-12">
                                         <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
                                             <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
@@ -165,23 +178,25 @@ const Salle = () => {
                     <div class="card">
                     <CardTitle title="Liste" />
                         <div class="card-body">
-                                        {salles.length === 0 ? (
-                                                <p>Aucune salle de réunion trouvée.</p>
+                                        {tables.length === 0 ? (
+                                                <p>Aucune table trouvée.</p>
                                             ) : (
                                                 <>
                                             <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width:'100%'}}>
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
-                                                        <th>Numéro/ Nom de la salle</th>
+                                                        <th>Référence</th>
+                                                        <th>Emplacement</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                {salles.map((salle, index) => (
-                                                    <tr key={salle.id}>
+                                                {tables.map((table, index) => (
+                                                    <tr key={table.id}>
                                                         <td>{index +1}</td>
-                                                        <td>{salle.numero_salle}</td>
+                                                        <td>{table.reference}</td>
+                                                        <td>{table.emplacement}</td>
                                                         <td>
                                                             <button className="btn btn-outline-info btn-sm">
                                                                 <i className='icofont-edit'></i>
@@ -189,7 +204,7 @@ const Salle = () => {
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {
-                                                                    setselectedSalle(salle);
+                                                                    setselectedtable(table);
                                                                     setShowModal(true);
                                                                 }}>
                                                                 <i className='icofont-trash'></i>
@@ -227,7 +242,7 @@ const Salle = () => {
                                                     <Modal.Title>Confirmation</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
-                                                    Êtes-vous sûr de vouloir supprimer la salle : <strong>{selectedSalle?.numero_salle}</strong> ?
+                                                    Êtes-vous sûr de vouloir supprimer la table : <strong>{selectedtable?.reference}</strong> ?
                                                 </Modal.Body>
                                                 <Modal.Footer>
                                                     <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -244,13 +259,8 @@ const Salle = () => {
                 </div>
                 
             </div>
-            {loading && (
-						<div className="overlay">
-							<div className="loader"></div>
-						</div>
-					)}
-        </LayoutMeeting>
+        </LayoutFastfood>
     )
 }
 
-export default Salle
+export default Table

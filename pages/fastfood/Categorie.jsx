@@ -22,7 +22,7 @@ const Categorie = () => {
     const [error, setError] = useState(null);
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); 
 
     // Récupération des categories avec pagination
     const fetchcategories = async (page = 1) => {
@@ -71,7 +71,7 @@ const Categorie = () => {
             }
         } catch (err) {
             console.error("Erreur lors de la suppression :", err);
-            alert("Une erreur est survenue lors de la suppression.");
+            alert("Une erreur est survenue lors de la suppression."); 
         }
     };
     //FIN SUPPRESSION
@@ -245,11 +245,6 @@ const Categorie = () => {
                 </div>
                 
             </div>
-            {loading && (
-						<div className="overlay">
-							<div className="loader"></div>
-						</div>
-					)}
         </LayoutFastfood>
     )
 }

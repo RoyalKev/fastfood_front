@@ -8,13 +8,14 @@ import '@/styles/css/custom.css';
 import Header from './Header';
 import SidebarFastfood from './SidebarFastfood';
 import { AuthContext } from '@/context/authContext';
+import HeaderPageVente from './HeaderPageVente';
 
 const LayoutFastfood2 = ({ children }) => (
     
     <>
-        <div id="ebazar-layout" className="theme-blue" style={{ backgroundColor:'#203668' }}>
-            <div className="main px-lg-4 px-md-4">
-                <Header />
+        <div id="ebazar-layout" className="theme-blue" style={{ backgroundColor:'#034261' }}>
+            <div className="main" style={{border:'2px solid #fff'}}>
+                <HeaderPageVente />
                 <div className="body d-flex py-3">
                     <div className="container-xxl">
                         {children}
