@@ -173,6 +173,7 @@ const UniteConversion = () => {
         bouteilleMereid: '',
         designation: '',
         prix: '',
+        prix_revient: '',
         unite: '',
         contenance: '',
         userid: null,
@@ -194,6 +195,7 @@ const UniteConversion = () => {
         formData.append('bouteilleMereid', dataproduit.bouteilleMereid);
         formData.append('designation', dataproduit.designation);
         formData.append('prix', dataproduit.prix);
+        formData.append('prix_revient', dataproduit.prix_revient);
         formData.append('unite', dataproduit.unite);
         formData.append('contenance', dataproduit.contenance);
         /*for (let [key, value] of formData.entries()) {
@@ -352,9 +354,14 @@ const UniteConversion = () => {
                                         </div>
 
                                         <div className="col-md-2">
-                                            <label className="form-label">Prix <font color="red">*</font></label>
+                                            <label className="form-label">Prix de vente<font color="red">*</font></label>
                                             <input class="form-control" name="prix" placeholder="Saisir le prix unit."
                                                 onChange={(e) => setDataproduit({ ...dataproduit, prix: e.target.value })} />
+                                        </div>
+                                        <div className="col-md-2">
+                                            <label className="form-label">Prix de revient<font color="red">*</font></label>
+                                            <input class="form-control" name="prix_revient" placeholder="Saisir le prix de revient."
+                                                onChange={(e) => setDataproduit({ ...dataproduit, prix_revient: e.target.value })} />
                                         </div>
                                         <div className="col-md-2">
                                             <label className="form-label">Unité<font color="red">*</font></label>
@@ -430,7 +437,8 @@ const UniteConversion = () => {
                                             <tr>
                                                 <th>Type </th>
                                                 <th>Désignation </th>
-                                                <th>Prix </th>
+                                                <th>Prix détail</th>
+                                                <th>Prix de revient</th>
                                                 <th>Unité </th>
                                                 <th>Stock disponible </th>
                                                 <th>Actions</th>
@@ -444,6 +452,7 @@ const UniteConversion = () => {
                                                     </td>
                                                     <td>{produit.designation}</td>
                                                     <td>{produit.prix}</td>
+                                                    <td>{produit.prix_revient}</td>
                                                     <td><span className='badge bg-info'>{produit.unite}</span></td>
                                                     <td style={{fontSize:'15px'}}>
                                                         {
