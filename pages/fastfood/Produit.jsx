@@ -326,7 +326,7 @@ const Produit = () => {
     //FIN MISE A JOUR
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="Produits" />
+            <BreadCrumb titre="aliments sources" />
             <div className="row g-3 mb-3">
                 <div className="col-xl-12 col-lg-12">
                     <div className="sticky-lg-top">
@@ -389,7 +389,7 @@ const Produit = () => {
                                             </select>
                                         </div>
                                         <div className="col-md-3">
-                                            <label className="form-label">Décomposable ?<font color="red">*</font></label>
+                                            <label className="form-label">Décomposable en part ?<font color="red">*</font></label>
                                             <select class="form-control"
                                                 name="puisable_en_portion"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, puisable_en_portion: e.target.value })}
@@ -402,7 +402,7 @@ const Produit = () => {
                                         {
                                             dataproduit.puisable_en_portion == "Oui" &&
                                             <div className="col-md-3">
-                                                <label className="form-label">Contenance <font color="red">*</font></label>
+                                                <label className="form-label">Contenance/ Nbre de part <font color="red">*</font></label>
                                                 <input class="form-control" name="contenance" placeholder="Saisir la quantité contenu en portion."
                                                     onChange={(e) => setDataproduit({ ...dataproduit, contenance: e.target.value })} />
                                             </div>

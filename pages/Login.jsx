@@ -24,7 +24,7 @@ const Login = () => {
 			toast.success('Connexion réussie !');
 			setTimeout(() => {
 			  setLoading(false);
-			  router.push('/fastfood/Dashboard');
+			  router.push('/MenuPage');
 			}, 1000);
 		  } else {
 			toast.error(response.data.Error);

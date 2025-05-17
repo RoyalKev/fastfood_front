@@ -34,7 +34,7 @@ const VenteValidee = () => {
     useEffect(() => {
         if (userid) {
           axios.get(`${StaticIP}api/vente/vente_validee/${userid}?page=${currentPage}&limit=${limit}`)
-          .then(response => {
+          .then(response => { 
             setVentes(response.data.ventes);
             settotalvente(response.data.totalvente);
             setTotalPages(response.data.totalPages); 
