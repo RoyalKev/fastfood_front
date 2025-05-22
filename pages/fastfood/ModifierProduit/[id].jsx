@@ -14,9 +14,11 @@ import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
 import Link from 'next/link';
 
-const Produit = () => {
+const ModifierProduit = () => {
 
     const router = useRouter();
+
+    const { id } = router.query;
 
     //Pour la liste des produits
     const [produits, setproduits] = useState([]);
@@ -125,7 +127,45 @@ const Produit = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
-    const [image, setImage] = useState(null);
+    //const [image, setImage] = useState(null);
+
+    //DONNEES DE MODIFICATION DUN CATEGORIE
+            const [detailproduit, setdetailproduit] = useState([])
+            
+                const fetchdetailproduit = async (e) => {
+                    setLoading(true);
+                    if (!id) return;
+                    try {
+                        const response = await axios.get(`${StaticIP}api/produit/detail/${id}`);
+                        if (response.data.Status) {
+                            setdetailproduit(response.data.Result);
+                        } else {
+                            setError("Erreur lors de la récupération des produits");
+                        }
+                    } catch (err) {
+                        setError("Une erreur est survenue lors des produits");
+                        console.error(err);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                useEffect(() => {
+                    fetchdetailproduit();
+                }, [id]);
+                useEffect(() => {
+                if (detailproduit && Object.keys(detailproduit).length > 0) {
+                    setDataproduit({
+                        designation: detailproduit.designation || "",
+                        unite: detailproduit.unite || "",
+                        seuil: detailproduit.seuil || "",
+                        stock_bloquant: detailproduit.stock_bloquant || "",
+                        puisable_en_portion: detailproduit.puisable_en_portion || "",
+                        contenance: detailproduit.contenance || "",
+                        userid: currentUser?.id || null,
+                    });
+                }
+            }, [detailproduit]);
+        //FIN DONNEE MODIF CATEGORIE
 
     const [dataproduit, setDataproduit] = useState({
         designation: '',
@@ -157,23 +197,18 @@ const Produit = () => {
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
-        if (image) formData.append('image', image);
+        //if (image) formData.append('image', image);
 
         setLoading(true);
         try {
-            const response = await axios.post(`${StaticIP}api/produit/nouveau`, formData, {
+            const response = await axios.put(`${StaticIP}api/produit/modifier/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('la réggg :', response.data)
             if (response.data.Status) {
-                toast.success('Produit créée avec succès !');
+                toast.success('Produit modifié avec succès !');
                 fetchproduits();
-                //dataproduit({});
-                /*setTimeout(() => {
-                    setLoading(false);
-                    //window.location.reload(); // Rechargement de la page
-                    //router.push('/NouveauBoutique');
-                }, 2000);*/
+                router.push('/fastfood/Produit');
             } else {
                 toast.error(response.data.Error);
                 setLoading(false);
@@ -338,7 +373,7 @@ const Produit = () => {
                                     <div className="row g-3 align-items-center">
                                         <div className="col-md-5">
                                             <label className="form-label">Désignation <font color="red">*</font></label>
-                                            <input class="form-control" name="designation" placeholder="Saisir la désignation"
+                                            <input class="form-control" name="designation" value={dataproduit.designation}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, designation: e.target.value })} />
                                         </div>
                                         <div className="col-md-4">
@@ -347,7 +382,7 @@ const Produit = () => {
                                                 name="unite"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, unite: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={dataproduit.unite}> {dataproduit.unite}</option>
                                                 <option value="Unité"> Unité</option>
                                                 <option value="Sac"> Sac</option>
                                                 <option value="Franc"> Franc</option>
@@ -375,7 +410,7 @@ const Produit = () => {
                                         </div>
                                         <div className="col-md-3">
                                             <label className="form-label">Seuil <font color="red">*</font></label>
-                                            <input class="form-control" name="seuil" placeholder="Saisir le seuil"
+                                            <input class="form-control" name="seuil" value={dataproduit.seuil}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, seuil: e.target.value })} />
                                         </div>
                                         <div className="col-md-4">
@@ -384,7 +419,7 @@ const Produit = () => {
                                                 name="stock_bloquant"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, stock_bloquant: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={dataproduit.stock_bloquant}> {dataproduit.stock_bloquant}</option>
                                                 <option value="Non"> Non</option>
                                                 <option value="Oui"> Oui</option>
                                             </select>
@@ -395,7 +430,7 @@ const Produit = () => {
                                                 name="puisable_en_portion"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, puisable_en_portion: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={dataproduit.puisable_en_portion}> {dataproduit.puisable_en_portion}</option>
                                                 <option value="Non"> Non</option>
                                                 <option value="Oui"> Oui</option>
                                             </select>
@@ -404,14 +439,14 @@ const Produit = () => {
                                             dataproduit.puisable_en_portion == "Oui" &&
                                             <div className="col-md-3">
                                                 <label className="form-label">Contenance/ Nbre de part <font color="red">*</font></label>
-                                                <input class="form-control" name="contenance" placeholder="Saisir la quantité contenu en portion."
+                                                <input class="form-control" name="contenance" value={dataproduit.contenance}
                                                     onChange={(e) => setDataproduit({ ...dataproduit, contenance: e.target.value })} />
                                             </div>
                                         }
 
                                         <div className="col-md-6" hidden>
                                             <label className="form-label">Qté Contenue dans embal. <font color="red">*</font></label>
-                                            <input class="form-control" name="contenu" placeholder="Saisir la quantité contenu."
+                                            <input class="form-control" name="contenu" value={dataproduit.contenu}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, contenu: e.target.value })} />
                                         </div>
 
@@ -790,4 +825,4 @@ const Produit = () => {
     )
 }
 
-export default Produit
+export default ModifierProduit

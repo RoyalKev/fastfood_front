@@ -12,6 +12,7 @@ import { Modal, Button } from "react-bootstrap";
 import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
+import Link from 'next/link';
 
 const Categorie = () => {
 
@@ -28,7 +29,7 @@ const Categorie = () => {
     const fetchcategories = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/categorie/liste?page=${page}&limit=5`);
+            const response = await axios.get(`${StaticIP}api/categorie/liste?page=${page}&limit=10`);
             if (response.data.Status) {
                 setcategories(response.data.Result);
                 setTotalPages(response.data.Pagination.totalPages);
@@ -184,9 +185,9 @@ const Categorie = () => {
                                                         <td>{index +1}</td>
                                                         <td>{categorie.libelle}</td>
                                                         <td>
-                                                            <button className="btn btn-outline-info btn-sm">
-                                                                <i className='icofont-edit'></i>
-                                                            </button>
+                                                            <Link href={`/fastfood/ModifierCategorie/${categorie.id}`}
+                                                                className="btn btn-outline-info btn-sm"> <i className='icofont-edit'></i>
+                                                            </Link>
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {

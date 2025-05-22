@@ -270,12 +270,8 @@ const Composition = () => {
                 )}
                 <ToastContainer />
 
-                <Modal show={showModalProduit} onHide={() => setShowModalProduit(false)} size="">
+                <Modal show={showModalProduit} onHide={() => setShowModalProduit(false)} size="" scrollable>
                     <Modal.Header closeButton>
-                        <Modal.Title>Rechercher la désignation d'un produit</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {/* Barre de recherche */}
                         <Form.Group controlId="searchPro">
                             <Form.Control
                                 type="text"
@@ -284,6 +280,10 @@ const Composition = () => {
                                 onChange={handleSearch}
                             />
                         </Form.Group>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {/* Barre de recherche */}
+                        
 
                         {/* Tableau des employés */}
                         <Table striped bordered hover className="mt-3">

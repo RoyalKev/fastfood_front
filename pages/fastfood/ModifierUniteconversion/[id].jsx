@@ -12,11 +12,12 @@ import { Modal, Button } from "react-bootstrap";
 import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
-import Link from 'next/link';
 
-const UniteConversion = () => {
+const ModifierUniteconversion = () => {
 
     const router = useRouter();
+
+    const { id } = router.query;
 
     //Pour la liste des produits
     const [categories, setcategories] = useState([]);
@@ -27,25 +28,8 @@ const UniteConversion = () => {
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [image, setImage] = useState(null);
-    //const [catid, setcatid] = useState('')
 
-    /*const handleChange = async (e) => {
-        try {
-            const response = await axios.get(`${StaticIP}api/categorie/produitcat/` + e.target.value);
-            if (response.data.Status) {
-                setcategories(response.data.Result);
-                setDataproduit((prev) => ({ ...prev, categorie_id: e.target.value }));
-            } else {
-                setError("Erreur lors de la récupération des produits");
-            }
-        } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des produits");
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };*/
+    
 
     const fetchcategories = async (e) => {
         setLoading(true);
@@ -166,15 +150,55 @@ const UniteConversion = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
+    //const [image, setImage] = useState(null);
+
+    const [detailproduit, setdetailproduit] = useState([])
+
+    const fetchdetailproduit = async (e) => {
+        setLoading(true);
+        if (!id) return;
+        try {
+            const response = await axios.get(`${StaticIP}api/uniteconversion/detail/${id}`);
+            if (response.data.Status) {
+                setdetailproduit(response.data.Result);
+            } else {
+                setError("Erreur lors de la récupération des unités de mesure");
+            }
+        } catch (err) {
+            setError("Une erreur est survenue lors de la récupération des unités de mesure");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchdetailproduit();
+    }, [id]);
+    useEffect(() => {
+    if (detailproduit && Object.keys(detailproduit).length > 0) {
+        setDataproduit({
+            categorie_id: detailproduit.categorie_id || "",
+            categorie: detailproduit.type || "",
+            bouteilleMereid: detailproduit.bouteilleMereid || "",
+            designation: detailproduit.designation || "",
+            prix: detailproduit.prix || "",
+            prix_revient: detailproduit.prix_revient || "",
+            unite: detailproduit.unite || "",
+            contenance: detailproduit.contenance || "",
+            userid: currentUser?.id || null,
+        });
+    }
+}, [detailproduit]);
+
     const [dataproduit, setDataproduit] = useState({
-        categorie_id: '',
-        categorie: '',
-        bouteilleMereid: '',
-        designation: '',
-        prix: '',
-        prix_revient: '',
-        unite: '',
-        contenance: '',
+        categorie_id: detailproduit.categorie_id,
+        categorie: detailproduit.type,
+        bouteilleMereid: detailproduit.bouteilleMereid,
+        designation: detailproduit.designation,
+        prix: detailproduit.prix,
+        prix_revient: detailproduit.prix_revient,
+        unite: detailproduit.unite,
+        contenance: detailproduit.contenance,
         userid: null,
     })
 
@@ -200,19 +224,17 @@ const UniteConversion = () => {
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
-        if (image) formData.append('image', image);
+        //if (image) formData.append('image', image);
 
         setLoading(true);
         try {
-            const response = await axios.post(`${StaticIP}api/uniteconversion/nouveau`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await axios.put(`${StaticIP}api/uniteconversion/modifier/${id}`, formData);
             console.log('la réggg :', response.data)
             if (response.data.Status) {
-                toast.success('Produit créée avec succès !');
+                toast.success('Produit modifié avec succès !');
                 setTimeout(() => {
                     setLoading(false);
-                    window.location.reload(); // Rechargement de la page
+                    router.push('/fastfood/UniteConversion'); // Rechargement de la page
                     //router.push('/NouveauBoutique');
                 }, 2000);
             } else {
@@ -224,7 +246,7 @@ const UniteConversion = () => {
             console.log(err)
             if (err.response && err.response.data) {
                 // Si l'erreur est liée à un type de fichier non supporté
-                toast.error(err.response.data.message || 'Erreur lors de la création de la tâche');
+                toast.error(err.response.data.message || 'Erreur lors de la modification du produit');
             } else {
                 console.log(err)
                 toast.error('Une erreur est survenue');
@@ -328,14 +350,14 @@ const UniteConversion = () => {
                                                 name="categorie"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, categorie: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={dataproduit.categorie}> {dataproduit.categorie}</option>
                                                 <option value="Plat"> Plat</option>
                                                 <option value="Boisson"> Boisson</option>
                                             </select>
                                         </div>
                                         <div className="col-md-3">
                                             <label className="form-label">Désignation</label>
-                                            <input class="form-control" name="designation" placeholder="Saisir la désignation"
+                                            <input class="form-control" name="designation" value={dataproduit.designation}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, designation: e.target.value })} />
                                         </div>
                                         <div className="col-md-2">
@@ -344,7 +366,7 @@ const UniteConversion = () => {
                                                 name="categorie_id"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, categorie_id: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value=""> {detailproduit?.Categorie?.libelle}</option>
                                                 {categories.map((categorie, index) => (
                                                     <option value={categorie.id} key={categorie.id}> {categorie.libelle}</option>
                                                 ))}
@@ -354,12 +376,12 @@ const UniteConversion = () => {
 
                                         <div className="col-md-2">
                                             <label className="form-label">Prix de vente<font color="red">*</font></label>
-                                            <input class="form-control" name="prix" placeholder="Saisir le prix unit."
+                                            <input class="form-control" name="prix" value={dataproduit.prix}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, prix: e.target.value })} />
                                         </div>
                                         <div className="col-md-2">
                                             <label className="form-label">Prix de revient<font color="red">*</font></label>
-                                            <input class="form-control" name="prix_revient" placeholder="Saisir le prix de revient."
+                                            <input class="form-control" name="prix_revient" value={dataproduit.prix_revient}
                                                 onChange={(e) => setDataproduit({ ...dataproduit, prix_revient: e.target.value })} />
                                         </div>
                                         <div className="col-md-2">
@@ -368,7 +390,7 @@ const UniteConversion = () => {
                                                 name="unite"
                                                 onChange={(e) => setDataproduit({ ...dataproduit, unite: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={dataproduit.unite}> {dataproduit.unite}</option>
                                                 <option value="Plat"> Plat</option>
                                                 <option value="Bouteille"> Bouteille</option>
                                                 <option value="Verre"> Verre</option>
@@ -398,18 +420,10 @@ const UniteConversion = () => {
                                             dataproduit.categorie == "Boisson" && dataproduit.unite == "Bouteille" &&
                                             <div className="col-md-2">
                                                 <label className="form-label">Nbre de verre contenu  <font color="red">*</font></label>
-                                                <input class="form-control" name="contenance" placeholder="Ex : 5"
+                                                <input class="form-control" name="contenance" value={dataproduit.contenance}
                                                     onChange={(e) => setDataproduit({ ...dataproduit, contenance: e.target.value })} />
                                             </div>
                                         }
-
-                                        <div className="col-md-8">
-                                            <label className="form-label">Uploader image<font color="red">*</font></label>
-
-                                            <input type="file" class="form-control"
-                                                name="image"
-                                                onChange={(e) => setImage(e.target.files[0])} />
-                                        </div>
                                         <div className="col-md-12">
                                             <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
                                                 <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
@@ -452,20 +466,19 @@ const UniteConversion = () => {
                                                     <td>{produit.designation}</td>
                                                     <td>{produit.prix}</td>
                                                     <td>{produit.prix_revient}</td>
-                                                    <td>
-                                                        <span className='badge bg-info'>{produit.unite}</span></td>
+                                                    <td><span className='badge bg-info'>{produit.unite}</span></td>
                                                     <td style={{fontSize:'15px'}}>
                                                         {
                                                             produit.type=="Boisson" &&
                                                             <span className='badge bg-success'>{produit.stock}</span>
                                                             
                                                         }
+                                                        
                                                     </td>
                                                     <td>
-                                                            
-                                                            <Link href={`/fastfood/ModifierUniteconversion/${produit.id}`}
-                                                                className="btn btn-outline-info btn-sm"> <i className='icofont-edit'></i>
-                                                            </Link>
+                                                        <button className="btn btn-outline-info btn-sm">
+                                                            <i className='icofont-edit'></i>
+                                                        </button>
                                                         <button className="btn btn-outline-warning btn-sm"
                                                             title="Détails"
                                                             onClick={() => handleShowproduit(produit.id)}>
@@ -640,4 +653,4 @@ const UniteConversion = () => {
     )
 }
 
-export default UniteConversion
+export default ModifierUniteconversion

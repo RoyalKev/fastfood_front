@@ -9,35 +9,37 @@ import React, { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Modal, Button } from "react-bootstrap";
+import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
-import Link from 'next/link';
 
-const Table = () => {
+const ModifierCategorie = () => {
 
     const router = useRouter();
 
-    //Pour la liste des tables
-    const [tables, settables] = useState([]);
+    const { id } = router.query;
+
+    //Pour la liste des categories
+    const [categories, setcategories] = useState([]);
     const [error, setError] = useState(null);
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1); 
 
-    // Récupération des tables avec pagination
-    const fetchtables = async (page = 1) => {
+    // Récupération des categories avec pagination
+    const fetchcategories = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/table/liste?page=${page}&limit=5`);
+            const response = await axios.get(`${StaticIP}api/categorie/liste?page=${page}&limit=5`);
             if (response.data.Status) {
-                settables(response.data.Result);
+                setcategories(response.data.Result);
                 setTotalPages(response.data.Pagination.totalPages);
                 setCurrentPage(response.data.Pagination.currentPage);
             } else {
-                setError("Erreur lors de la récupération des tables");
+                setError("Erreur lors de la récupération des categories");
             }
         } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des tables");
+            setError("Une erreur est survenue lors de la récupération des categories");
             console.error(err);
         } finally {
             setLoading(false);
@@ -45,7 +47,7 @@ const Table = () => {
     };
 
     useEffect(() => {
-        fetchtables(currentPage);
+        fetchcategories(currentPage);
     }, [currentPage]);
 
     const goToPage = (page) => {
@@ -57,15 +59,15 @@ const Table = () => {
 
     //POUR LA SUPPRESSION
     const [showModal, setShowModal] = useState(false);
-    const [selectedtable, setselectedtable] = useState(null);
+    const [selectedcategorie, setselectedcategorie] = useState(null);
     const handleDelete = async () => {
-        if (!selectedtable) return;
+        if (!selectedcategorie) return;
         try {
-            const response = await axios.delete(`${StaticIP}api/table/supprimer/${selectedtable.id}`);
+            const response = await axios.delete(`${StaticIP}api/categorie/supprimer/${selectedcategorie.id}`);
             if (response.data.Status) {
-                settables(tables.filter((dep) => dep.id !== selectedtable.id));
+                setcategories(categories.filter((dep) => dep.id !== selectedcategorie.id));
                 setShowModal(false);
-                toast.success("table supprimée avec succès !");
+                toast.success("categorie supprimée avec succès !");
             } else {
                 alert("Erreur : " + response.data.message);
             }
@@ -80,9 +82,41 @@ const Table = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
-    const [datatable, setDatatable] = useState({
-        reference: '',
-        emplacement: '',
+    //DONNEES DE MODIFICATION DUN CATEGORIE
+        const [detailcategorie, setddetailcategorie] = useState([])
+        
+            const fetchdetailcategorie = async (e) => {
+                setLoading(true);
+                if (!id) return;
+                try {
+                    const response = await axios.get(`${StaticIP}api/categorie/detail/${id}`);
+                    if (response.data.Status) {
+                        setddetailcategorie(response.data.Result);
+                    } else {
+                        setError("Erreur lors de la récupération des categories");
+                    }
+                } catch (err) {
+                    setError("Une erreur est survenue lors des categories");
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            useEffect(() => {
+                fetchdetailcategorie();
+            }, [id]);
+            useEffect(() => {
+            if (detailcategorie && Object.keys(detailcategorie).length > 0) {
+                setDatacategorie({
+                    libelle: detailcategorie.libelle || "",
+                    userid: currentUser?.id || null,
+                });
+            }
+        }, [detailcategorie]);
+    //FIN DONNEE MODIF CATEGORIE
+
+    const [datacategorie, setDatacategorie] = useState({
+        libelle: detailcategorie.libelle,
         userid: null,
     })
 
@@ -90,16 +124,15 @@ const Table = () => {
     useEffect(() => {
         if (currentUser) {
             setuserId(currentUser.id);
-            setDatatable((prev) => ({ ...prev, userid: currentUser.id }));
+            setDatacategorie((prev) => ({ ...prev, userid: currentUser.id }));
         }
     }, [currentUser]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append('userid', datatable.userid);
-        formData.append('reference', datatable.reference);
-        formData.append('emplacement', datatable.emplacement);
+        formData.append('userid', datacategorie.userid);
+        formData.append('libelle', datacategorie.libelle);
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
@@ -107,11 +140,11 @@ const Table = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${StaticIP}api/table/nouveau`, formData);
+            const response = await axios.put(`${StaticIP}api/categorie/modifier/${id}`, formData);
             console.log('la réggg :', response.data)
             if (response.data.Status) {
-                toast.success('Table créée avec succès !');
-                fetchtables();
+                toast.success('Categorie créée avec succès !');
+                router.push('/fastfood/Categorie');
             } else {
                 toast.error(response.data.Error);
                 setLoading(false);
@@ -121,7 +154,7 @@ const Table = () => {
             console.log(err)
             if (err.response && err.response.data) {
                 // Si l'erreur est liée à un type de fichier non supporté
-                toast.error(err.response.data.message || 'Erreur lors de la création de la table');
+                toast.error(err.response.data.message || 'Erreur lors de la création de la categorie');
             } else {
                 console.log(err)
                 toast.error('Une erreur est survenue');
@@ -130,7 +163,7 @@ const Table = () => {
     };
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="tables" />
+            <BreadCrumb titre="categories" />
             <div className="row g-3 mb-3">
                 <div className="col-xl-4 col-lg-4">
                     <div className="sticky-lg-top">
@@ -140,24 +173,13 @@ const Table = () => {
                             <form onSubmit={handleSubmit}>
                                 <div className="row g-3 align-items-center">
                                     <div className="col-md-12">
-                                        <label className="form-label">Référence de la table<font color="red">*</font></label>
+                                        <label className="form-label">Libellé de la categorie</label>
                                         <input type="text" class="form-control"
-                                            name="reference"
-                                            onChange={(e) => setDatatable({ ...datatable, reference: e.target.value })}
-                                            placeholder="Saisir le reference de la table"
+                                            name="libelle" 
+                                            onChange={(e) => setDatacategorie({ ...datacategorie, libelle: e.target.value })}
+                                            value={datacategorie.libelle}
                                         />
                                     </div>
-                                    <div className="col-md-12">
-                                            <label className="form-label">Emplacement<font color="red">*</font></label>
-                                            <select class="form-control"
-                                                name="emplacement"
-                                                onChange={(e) => setDatatable({ ...datatable, emplacement: e.target.value })}
-                                            >
-                                                <option value=""> Sélectionner</option>
-                                                <option value="Intérieur"> Intérieur</option>
-                                                <option value="Extérieur"> Extérieur</option>
-                                            </select>
-                                        </div>
                                     <div className="col-md-12">
                                         <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
                                             <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
@@ -175,33 +197,31 @@ const Table = () => {
                     <div class="card">
                     <CardTitle title="Liste" />
                         <div class="card-body">
-                                        {tables.length === 0 ? (
-                                                <p>Aucune table trouvée.</p>
+                                        {categories.length === 0 ? (
+                                                <p>Aucune catégorie trouvée.</p>
                                             ) : (
                                                 <>
                                             <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width:'100%'}}>
                                                 <thead>
                                                     <tr>
                                                         <th>N°</th>
-                                                        <th>Référence</th>
-                                                        <th>Emplacement</th>
+                                                        <th>Libellé categorie</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                {tables.map((table, index) => (
-                                                    <tr key={table.id}>
+                                                {categories.map((categorie, index) => (
+                                                    <tr key={categorie.id}>
                                                         <td>{index +1}</td>
-                                                        <td>{table.reference}</td>
-                                                        <td>{table.emplacement}</td>
+                                                        <td>{categorie.libelle}</td>
                                                         <td>
-                                                            <Link href={`/fastfood/ModifierTable/${table.id}`}
-                                                                className="btn btn-outline-info btn-sm"> <i className='icofont-edit'></i>
-                                                            </Link>
+                                                            <button className="btn btn-outline-info btn-sm">
+                                                                <i className='icofont-edit'></i>
+                                                            </button>
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {
-                                                                    setselectedtable(table);
+                                                                    setselectedcategorie(categorie);
                                                                     setShowModal(true);
                                                                 }}>
                                                                 <i className='icofont-trash'></i>
@@ -239,7 +259,7 @@ const Table = () => {
                                                     <Modal.Title>Confirmation</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
-                                                    Êtes-vous sûr de vouloir supprimer la table : <strong>{selectedtable?.reference}</strong> ?
+                                                    Êtes-vous sûr de vouloir supprimer la categorie : <strong>{selectedcategorie?.libelle}</strong> ?
                                                 </Modal.Body>
                                                 <Modal.Footer>
                                                     <Button variant="secondary" onClick={() => setShowModal(false)}>
@@ -260,4 +280,4 @@ const Table = () => {
     )
 }
 
-export default Table
+export default ModifierCategorie

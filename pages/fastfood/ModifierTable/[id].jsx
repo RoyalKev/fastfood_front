@@ -11,11 +11,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Modal, Button } from "react-bootstrap";
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
-import Link from 'next/link';
 
-const Table = () => {
+const ModifierTable = () => {
 
     const router = useRouter();
+
+    const { id } = router.query;
 
     //Pour la liste des tables
     const [tables, settables] = useState([]);
@@ -80,9 +81,43 @@ const Table = () => {
     const [userid, setuserId] = useState(null)
     const [loading, setLoading] = useState(false);
 
+    //DONNEES DE MODIFICATION DUN CATEGORIE
+        const [detailtable, setddetailtable] = useState([])
+        
+            const fetchdetailtable = async (e) => {
+                setLoading(true);
+                if (!id) return;
+                try {
+                    const response = await axios.get(`${StaticIP}api/table/detail/${id}`);
+                    if (response.data.Status) {
+                        setddetailtable(response.data.Result);
+                    } else {
+                        setError("Erreur lors de la récupération des categories");
+                    }
+                } catch (err) {
+                    setError("Une erreur est survenue lors des categories");
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            useEffect(() => {
+                fetchdetailtable();
+            }, [id]);
+            useEffect(() => {
+            if (detailtable && Object.keys(detailtable).length > 0) {
+                setDatatable({
+                    emplacement: detailtable.emplacement || "",
+                    reference: detailtable.reference || "",
+                    userid: currentUser?.id || null,
+                });
+            }
+        }, [detailtable]);
+    //FIN DONNEE MODIF CATEGORIE
+
     const [datatable, setDatatable] = useState({
-        reference: '',
-        emplacement: '',
+        reference: detailtable.reference ,
+        emplacement: detailtable.emplacement,
         userid: null,
     })
 
@@ -107,7 +142,7 @@ const Table = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(`${StaticIP}api/table/nouveau`, formData);
+            const response = await axios.put(`${StaticIP}api/table/modifier/${id}`, formData);
             console.log('la réggg :', response.data)
             if (response.data.Status) {
                 toast.success('Table créée avec succès !');
@@ -144,7 +179,7 @@ const Table = () => {
                                         <input type="text" class="form-control"
                                             name="reference"
                                             onChange={(e) => setDatatable({ ...datatable, reference: e.target.value })}
-                                            placeholder="Saisir le reference de la table"
+                                            value={datatable.reference}
                                         />
                                     </div>
                                     <div className="col-md-12">
@@ -153,7 +188,7 @@ const Table = () => {
                                                 name="emplacement"
                                                 onChange={(e) => setDatatable({ ...datatable, emplacement: e.target.value })}
                                             >
-                                                <option value=""> Sélectionner</option>
+                                                <option value={datatable.emplacement}> {datatable.emplacement}</option>
                                                 <option value="Intérieur"> Intérieur</option>
                                                 <option value="Extérieur"> Extérieur</option>
                                             </select>
@@ -195,9 +230,9 @@ const Table = () => {
                                                         <td>{table.reference}</td>
                                                         <td>{table.emplacement}</td>
                                                         <td>
-                                                            <Link href={`/fastfood/ModifierTable/${table.id}`}
-                                                                className="btn btn-outline-info btn-sm"> <i className='icofont-edit'></i>
-                                                            </Link>
+                                                            <button className="btn btn-outline-info btn-sm">
+                                                                <i className='icofont-edit'></i>
+                                                            </button>
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {
@@ -260,4 +295,4 @@ const Table = () => {
     )
 }
 
-export default Table
+export default ModifierTable

@@ -261,7 +261,7 @@ const Inventaireboisson = () => {
 
 
                 <ToastContainer />
-                <Modal show={showModalProduit} onHide={() => setShowModalProduit(false)}>
+                <Modal show={showModalProduit} onHide={() => setShowModalProduit(false)} scrollable>
                     <Modal.Header closeButton>
                         <Modal.Title>Sélectionner un produit</Modal.Title>
                     </Modal.Header>
