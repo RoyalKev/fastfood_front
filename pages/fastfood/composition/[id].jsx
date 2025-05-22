@@ -24,7 +24,7 @@ const Composition = () => {
     const fetchproduits = async (e) => {
         //setLoading(true);
         try {
-            const response = await axios.get(`${StaticIP}api/produit/liste`);
+            const response = await axios.get(`${StaticIP}api/produit/liste2`);
             if (response.data.Status) {
                 setproduits(response.data.Result);
             } else {
@@ -87,11 +87,7 @@ const Composition = () => {
             console.log('la réggg :', response.data)
             if (response.data.Status) {
                 toast.success('Ligne créée avec succès !');
-                setTimeout(() => {
-                    setLoading(false);
-                    window.location.reload(); // Rechargement de la page
-                    //router.push('/NouveauBoutique');
-                }, 2000);
+                fetchlignes();
             } else {
                 toast.error(response.data.Error);
                 setLoading(false);
@@ -113,10 +109,9 @@ const Composition = () => {
 
     const fetchlignes = async () => {
         if (!id) return; // On ne fait rien si l'id n'est pas défini
-      
         setLoading(true);
         try {
-          const response = await axios.get(`${StaticIP}api/composition/lignes?id=${id}`);
+          const response = await axios.get(`${StaticIP}api/composition/lignes/${id}`);
           if (response.data.Status) {
             setlignes(Array.isArray(response.data.Result) ? response.data.Result : []);
           } else {
@@ -131,9 +126,7 @@ const Composition = () => {
       };
 
       useEffect(() => {
-        if (id) { // Vérifiez que l'id est bien défini
           fetchlignes();
-        }
       }, [id]);
 
 
