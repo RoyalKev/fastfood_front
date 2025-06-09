@@ -31,16 +31,10 @@ const Login = () => {
 			setLoading(false); // Désactiver le chargement si une erreur applicative survient
 		  }
 		} catch (error) {
-		  console.error('Erreur lors de la connexion :', error.message);
-		  if (error.response) {
-			console.error('Détails de la réponse du serveur :', error.response.data);
-		  } else if (error.request) {
-			console.error('Pas de réponse du serveur :', error.request);
-		  } else {
-			console.error('Erreur inconnue :', error.message);
-		  }
-		  setLoading(false);
-		  toast.error('Une erreur est survenue. Veuillez réessayer.');
+		  console.error("Erreur lors de la connexion :", error.response);
+    		const errorMsg = error.response?.data?.errors?.[0]?.msg || error.response?.data?.Error || 'Erreur de connexion';
+    		toast.error(errorMsg);
+    		setLoading(false);
 		}
 	  };
 	return (

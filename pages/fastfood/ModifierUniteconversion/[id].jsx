@@ -484,7 +484,7 @@ const ModifierUniteconversion = () => {
                                                             onClick={() => handleShowproduit(produit.id)}>
                                                             <i className='icofont-eye' style={{ color: "#cfa108" }}></i>
                                                         </button>
-                                                        <button className="btn btn-outline-danger btn-sm"
+                                                        <button className="btn btn-outline-danger btn-sm" hidden
                                                             title="Supprimer"
                                                             onClick={() => {
                                                                 setselectedproduit(produit);

@@ -12,6 +12,7 @@ import { Modal, Button } from "react-bootstrap";
 import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
 import LayoutFastfood from '@/components/LayoutFastfood';
+import Link from 'next/link';
 
 const Utilisateur = () => {
 
@@ -158,6 +159,52 @@ const Utilisateur = () => {
             }
         }
     };
+
+    //MODIFICATION DU utilisateur
+    const [showModalModifier, setShowModalModifier] = useState(false);
+    const openEditModal = (user) => {
+        setselectedUtilisateur({ ...user });
+        setDataUtilisateur({ ...user });
+        console.log(selectedUtilisateur)
+        setShowModalModifier(true);
+    };
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('userid', dataUtilisateur.userid);
+        formData.append('nom', dataUtilisateur.nom);
+        formData.append('email', dataUtilisateur.email);
+        formData.append('role', dataUtilisateur.role);
+        setLoading(true);
+        try {
+            const response = await axios.put(`${StaticIP}api/auth/modifier/${dataUtilisateur.id}`, formData);
+            console.log('la réggg :', response.data)
+            if (response.data.Status) {
+                toast.success('Utilisateur modifié avec succès !');
+                setTimeout(() => {
+                    setLoading(false);
+                    window.location.reload(); // Rechargement de la page
+                    //router.push('/NouveauBoutique');
+                }, 2000);
+                setDataUtilisateur([])
+            } else {
+                toast.error(response.data.Error);
+                setLoading(false);
+            }
+        } catch (err) {
+            setLoading(false);
+            console.log(err)
+            if (err.response && err.response.data) {
+                // Si l'erreur est liée à un type de fichier non supporté
+                toast.error(err.response.data.message || 'Erreur lors de la modification de L\'utilisateur');
+            } else {
+                console.log(err)
+                toast.error('Une erreur est survenue');
+            }
+        }
+    };
+    //FIN MODIFICATION DU utilisateur
+
     return (
         <LayoutFastfood>
             <BreadCrumb titre="utilisateurs" />
@@ -167,25 +214,25 @@ const Utilisateur = () => {
                         <div className="card mb-3">
                             <CardTitle title="Nouveau" />
                             <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="row g-3 align-items-center">
-                                    <div className="col-md-12">
-                                        <label className="form-label">Nom & Prénoms</label>
-                                        <input type="text" class="form-control"
-                                            name="nom"
-                                            onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, nom: e.target.value })}
-                                            placeholder="Saisir le nom de la direction"
-                                        />
-                                    </div>
-                                    <div className="col-md-12">
-                                        <label className="form-label">Email</label>
-                                        <input type="text" class="form-control"
-                                            name="email"
-                                            onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, email: e.target.value })}
-                                            placeholder="Saisir le nom de la direction"
-                                        />
-                                    </div>
-                                    <div className="col-md-12">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="row g-3 align-items-center">
+                                        <div className="col-md-12">
+                                            <label className="form-label">Nom & Prénoms</label>
+                                            <input type="text" class="form-control"
+                                                name="nom"
+                                                onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, nom: e.target.value })}
+                                                placeholder="Saisir le nom de la direction"
+                                            />
+                                        </div>
+                                        <div className="col-md-12">
+                                            <label className="form-label">Email</label>
+                                            <input type="text" class="form-control"
+                                                name="email"
+                                                onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, email: e.target.value })}
+                                                placeholder="Saisir le nom de la direction"
+                                            />
+                                        </div>
+                                        <div className="col-md-12">
                                             <label className="form-label">Roles <font color="red">*</font></label>
                                             <select class="form-control"
                                                 name="role"
@@ -197,12 +244,12 @@ const Utilisateur = () => {
 
                                             </select>
                                         </div>
-                                    <div className="col-md-12">
-                                        <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
-                                            <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
-                                        </button>
+                                        <div className="col-md-12">
+                                            <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
+                                                <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
                                 </form>
                             </div>
                         </div>
@@ -212,96 +259,165 @@ const Utilisateur = () => {
 
                 <div class="col-xl-8 col-lg-8">
                     <div class="card">
-                    <CardTitle title="Liste" />
+                        <CardTitle title="Liste" />
                         <div class="card-body">
-                                        {utilisateurs.length === 0 ? (
-                                                <p>Aucun utilisateur trouvé.</p>
-                                            ) : (
-                                                <>
-                                            <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width:'100%'}}>
-                                                <thead>
-                                                    <tr>
-                                                        <th>N°</th>
-                                                        <th>Nom </th>
-                                                        <th>Email </th>
-                                                        <th>Role </th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                {utilisateurs.map((user, index) => (
-                                                    <tr key={user.id}>
-                                                        <td>{index +1}</td>
-                                                        <td>{user.nom}</td>
-                                                        <td>{user.email}</td>
-                                                        <td>{user.role}</td>
-                                                        <td>
-                                                            <button className="btn btn-outline-info btn-sm">
-                                                                <i className='icofont-edit'></i>
-                                                            </button>
-                                                            <button className="btn btn-outline-danger btn-sm"
-                                                                title="Supprimer"
-                                                                onClick={() => {
-                                                                    setselectedUtilisateur(user);
-                                                                    setShowModal(true);
-                                                                }}>
-                                                                <i className='icofont-trash'></i>
-                                                            </button>
-                                                            
-                                                        </td>
-                                                    </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                            <div style={{ marginTop: "20px", textAlign: "center" }}>
-                                            <button
-                                                onClick={() => goToPage(currentPage - 1)}
-                                                disabled={currentPage === 1}
-                                                style={{ marginRight: "10px" }}
-                                                className="btn btn-warning btn-sm"
-                                            >
-                                                <span aria-hidden="true">&laquo;</span> Précédent
-                                            </button>
-                                            <span>Page {currentPage} sur {totalPages}</span>
-                                            <button
-                                                onClick={() => goToPage(currentPage + 1)}
-                                                disabled={currentPage === totalPages}
-                                                style={{ marginLeft: "10px" }}
-                                                className="btn btn-warning btn-sm"
-                                            >
-                                                Suivant <span aria-hidden="true">&raquo;</span>
-                                            </button>
+                            {utilisateurs.length === 0 ? (
+                                <p>Aucun utilisateur trouvé.</p>
+                            ) : (
+                                <>
+                                    <table id="myDataTable" class="table table-hover align-middle mb-0" style={{ width: '100%' }}>
+                                        <thead>
+                                            <tr>
+                                                <th>N°</th>
+                                                <th>Nom </th>
+                                                <th>Email </th>
+                                                <th>Role </th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {utilisateurs.map((user, index) => (
+                                                <tr key={user.id}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{user.nom}</td>
+                                                    <td>{user.email}</td>
+                                                    <td>{user.role}</td>
+                                                    <td>
+                                                        <Link href="#" className="btn btn-outline-info btn-sm"
+                                                            onClick={() => openEditModal(user)}>
+                                                            <i className='icofont-edit'></i>
+                                                        </Link>
+                                                        <button className="btn btn-outline-danger btn-sm"
+                                                            title="Supprimer"
+                                                            onClick={() => {
+                                                                setselectedUtilisateur(user);
+                                                                setShowModal(true);
+                                                            }}>
+                                                            <i className='icofont-trash'></i>
+                                                        </button>
+
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    <div style={{ marginTop: "20px", textAlign: "center" }}>
+                                        <button
+                                            onClick={() => goToPage(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            style={{ marginRight: "10px" }}
+                                            className="btn btn-warning btn-sm"
+                                        >
+                                            <span aria-hidden="true">&laquo;</span> Précédent
+                                        </button>
+                                        <span>Page {currentPage} sur {totalPages}</span>
+                                        <button
+                                            onClick={() => goToPage(currentPage + 1)}
+                                            disabled={currentPage === totalPages}
+                                            style={{ marginLeft: "10px" }}
+                                            className="btn btn-warning btn-sm"
+                                        >
+                                            Suivant <span aria-hidden="true">&raquo;</span>
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                            {/* Modal de confirmation */}
+                            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Confirmation</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    Êtes-vous sûr de vouloir supprimer l'utilisateur : <strong>{selectedUtilisateur?.nom}</strong> ?
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                                        Annuler
+                                    </Button>
+                                    <Button variant="danger" onClick={handleDelete}>
+                                        Confirmer
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+                            {/* Modal de modification */}
+                            <Modal show={showModalModifier} onHide={() => setShowModalModifier(false)} scrollable>
+                                <form class="form-wizard" id="regForm" onSubmit={handleSubmit}>
+                                    <Modal.Header closeButton>
+                                       Modification de l' utilisateur : {selectedUtilisateur?.nom}
+                                    </Modal.Header>
+
+                                    <Modal.Body>
+                                        <div className='row'>
+                                            <div className='col-md-12'>
+                                                <div class="card">
+                                                    <div class="card-header pb-0">
+                                                        <p class="desc mb-0 mt-1"><span></span><code></code><span>
+                                                            Les champs avec <font color="red">*</font> obligatoires.</span></p>
+                                                    </div>
+                                                    <div class="card-body custom-input">
+
+                                                        <div class="tab active" style={{ display: 'block' }}>
+                                                            <div class="row g-3">
+                                                                <div class="col-12">
+                                                                    <label for="nom">Nom</label>
+                                                                    <input class="form-control" id="nom" name="nom" type="text"
+                                                                        value={dataUtilisateur.nom}
+                                                                        onChange={(e) =>
+                                                                            setDataUtilisateur({ ...dataUtilisateur, nom: e.target.value })
+                                                                        } />
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="form-label" for="contacts">Email </label>
+                                                                    <input class="form-control" id="contacts"
+                                                                        type="email" name='email' placeholder="Ex : mercanto@gmail.com"
+                                                                        value={dataUtilisateur.email}
+                                                                        onChange={(e) =>
+                                                                            setDataUtilisateur({ ...dataUtilisateur, email: e.target.value })
+                                                                        } />
+
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="col-sm-12 form-label" for="adresse">Rôle </label>
+                                                                    <select class="form-control"
+                                                                        name="role"
+                                                                        onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, role: e.target.value })}
+                                                                    >
+                                                                        <option value={dataUtilisateur.role}> {dataUtilisateur.role}</option>
+                                                                        <option value="User"> User</option>
+                                                                        <option value="Admin"> Admin</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        </>
-                                            )}
-                                            {/* Modal de confirmation */}
-                                            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                                                <Modal.Header closeButton>
-                                                    <Modal.Title>Confirmation</Modal.Title>
-                                                </Modal.Header>
-                                                <Modal.Body>
-                                                    Êtes-vous sûr de vouloir supprimer l'utilisateur : <strong>{selectedUtilisateur?.nom}</strong> ?
-                                                </Modal.Body>
-                                                <Modal.Footer>
-                                                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                                                        Annuler
-                                                    </Button>
-                                                    <Button variant="danger" onClick={handleDelete}>
-                                                        Confirmer
-                                                    </Button>
-                                                </Modal.Footer>
-                                            </Modal>
-                                </div>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="danger" onClick={() => setShowModalModifier(false)}>
+                                            Annuler
+                                        </Button>
+                                        <Button variant="success" onClick={handleEditSubmit} disabled={loading}>
+                                            <i className='icofont-save'></i> {loading ? 'Modification en cours...' : 'Modifier'}
+                                        </Button>
+                                    </Modal.Footer>
+                                </form>
+                            </Modal>
+                        </div>
 
                     </div>
                 </div>
-                
+
             </div>
             {loading && (
-						<div className="overlay">
-							<div className="loader"></div>
-						</div>
-					)}
+                <div className="overlay">
+                    <div className="loader"></div>
+                </div>
+            )}
         </LayoutFastfood>
     )
 }

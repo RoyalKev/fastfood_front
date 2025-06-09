@@ -302,7 +302,7 @@ const ModifierVente = () => {
         <LayoutFastfood2>
             <div className="row" style={{ marginTop: '-35px' }}>
                 {/* Catégories */}
-                <div className="col-md-2">
+                <div className="col-md-2" hidden>
                     <nav className='sticky-sidebar'>
                         <button className='btn btn-secondary w-100 mb-1'
                             onClick={() => setSelectedCategory(null)}
@@ -320,7 +320,7 @@ const ModifierVente = () => {
                 </div>
 
                 {/* Produits */}
-                <div className="col-md-7">
+                <div className="col-md-8">
                     <nav className='sticky-sidebar'>
                         {/* Champ de recherche */}
                         <div className="mb-3">
@@ -354,7 +354,7 @@ const ModifierVente = () => {
                 </div>
 
                 {/* Panier */}
-                <div className="col-md-3">
+                <div className="col-md-4">
                     <div className='card sticky-sidebar-panier' style={{ backgroundColor: '#f1f1f1' }}>
                         <nav className='sticky-sidebar'>
                             <form onSubmit={handleSubmit}>

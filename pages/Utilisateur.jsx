@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Modal, Button } from "react-bootstrap";
 import LayoutMeeting from '@/components/LayoutMeeting';
 import { StaticIP } from '@/config/staticip';
+import Link from 'next/link';
 
 const Utilisateur = () => {
 
@@ -158,6 +159,50 @@ const Utilisateur = () => {
             }
         }
     };
+    //MODIFICATION DU utilisateur
+    const [showModalModifier, setShowModalModifier] = useState(true);
+    const openEditModal = (user) => {
+        setselectedUtilisateur({ ...user });
+        setDataUtilisateur({ ...user });
+        console.log(selectedUtilisateur)
+        setShowModalModifier(true);
+    };
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('userid', dataUtilisateur.userid);
+        formData.append('nom', dataUtilisateur.nom);
+        formData.append('email', dataUtilisateur.email);
+        formData.append('role', dataUtilisateur.role);
+        setLoading(true);
+        try {
+            const response = await axios.put(`${StaticIP}api/auth/modifier/${dataUtilisateur.id}`, formData);
+            console.log('la réggg :', response.data)
+            if (response.data.Status) {
+                toast.success('Utilisateur modifié avec succès !');
+                setTimeout(() => {
+                    setLoading(false);
+                    window.location.reload(); // Rechargement de la page
+                    //router.push('/NouveauBoutique');
+                }, 2000);
+                setDataUtilisateur([])
+            } else {
+                toast.error(response.data.Error);
+                setLoading(false);
+            }
+        } catch (err) {
+            setLoading(false);
+            console.log(err)
+            if (err.response && err.response.data) {
+                // Si l'erreur est liée à un type de fichier non supporté
+                toast.error(err.response.data.message || 'Erreur lors de la modification de L\'utilisateur');
+            } else {
+                console.log(err)
+                toast.error('Une erreur est survenue');
+            }
+        }
+    };
+    //FIN MODIFICATION DU utilisateur
     return (
         <LayoutMeeting>
             <BreadCrumb titre="utilisateurs" />
@@ -248,9 +293,10 @@ const Utilisateur = () => {
                                                         <td>{user.email}</td>
                                                         <td>{user.role}</td>
                                                         <td>
-                                                            <button className="btn btn-outline-info btn-sm">
+                                                            <Link className="btn btn-outline-info btn-sm"
+                                                                onClick={() => openEditModal(user)}>
                                                                 <i className='icofont-edit'></i>
-                                                            </button>
+                                                            </Link>
                                                             <button className="btn btn-outline-danger btn-sm"
                                                                 title="Supprimer"
                                                                 onClick={() => {
@@ -303,6 +349,74 @@ const Utilisateur = () => {
                                                     </Button>
                                                 </Modal.Footer>
                                             </Modal>
+                                            {/* Modal de modification */}
+                            <Modal show={showModalModifier} onHide={() => setShowModalModifier(false)} scrollable>
+                                <form class="form-wizard" id="regForm" onSubmit={handleSubmit}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Modification de l' utilisateur : <strong>{selectedUtilisateur?.nom}</strong></Modal.Title>
+                                    </Modal.Header>
+
+                                    <Modal.Body>
+                                        <div className='row'>
+                                            <div className='col-md-12'>
+                                                <div class="card">
+                                                    <div class="card-header pb-0">
+                                                        <p class="desc mb-0 mt-1"><span></span><code></code><span>
+                                                            Les champs avec <font color="red">*</font> obligatoires.</span></p>
+                                                    </div>
+                                                    <div class="card-body custom-input">
+
+                                                        <div class="tab active" style={{ display: 'block' }}>
+                                                            <div class="row g-3">
+                                                                <div class="col-12">
+                                                                    <label for="nom">Nom</label>
+                                                                    <input class="form-control" id="nom" name="nom" type="text"
+                                                                        value={dataUtilisateur.nom}
+                                                                        onChange={(e) =>
+                                                                            setDataUtilisateur({ ...dataUtilisateur, nom: e.target.value })
+                                                                        } />
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="form-label" for="contacts">Email </label>
+                                                                    <input class="form-control" id="contacts"
+                                                                        type="email" name='email' placeholder="Ex : mercanto@gmail.com"
+                                                                        value={dataUtilisateur.email}
+                                                                        onChange={(e) =>
+                                                                            setDataUtilisateur({ ...dataUtilisateur, email: e.target.value })
+                                                                        } />
+
+                                                                </div>
+                                                                <div class="col-12">
+                                                                    <label class="col-sm-12 form-label" for="adresse">Rôle </label>
+                                                                    <select class="form-control"
+                                                                            name="role"
+                                                                            onChange={(e) => setDataUtilisateur({ ...dataUtilisateur, role: e.target.value })}
+                                                                        >
+                                                                            <option value={dataUtilisateur.role}> {dataUtilisateur.role}</option>
+                                                                            <option value="Comptable"> Comptable</option>
+                                                                            <option value="Admin"> Admin</option>
+                                                                        </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="danger" onClick={() => setShowModalModifier(false)}>
+                                            Annuler
+                                        </Button>
+                                        <Button variant="success" onClick={handleEditSubmit} disabled={loading}>
+                                            <i className='icofont-save'></i> {loading ? 'Modification en cours...' : 'Modifier'}
+                                        </Button>
+                                    </Modal.Footer>
+                                </form>
+                            </Modal>
                                 </div>
 
                     </div>

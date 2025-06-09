@@ -92,7 +92,11 @@ const VenteEnCours = () => {
                 <div class="col-xl-12 col-lg-12">
                     <div className="card">
                         <div class="card-header">
-                            <h6>Toutes les ventes </h6>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Link href="/fastfood/Vente" className="btn btn-success">
+                                    <i className='icofont-plus'></i> Nouvelle vente
+                                </Link>
+                            </div>
                         </div>
                         <div class="card-body">
                             <table className="table table-responsive border-collapse border border-gray-200">
@@ -164,7 +168,7 @@ const VenteEnCours = () => {
                                                             }}
                                                         >
                                                             <i className="icofont-check"></i>
-                                                        </button>
+                                                        </button> 
                                                         </>
                                                     }
                                                 </td>

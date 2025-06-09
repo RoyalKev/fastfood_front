@@ -31,7 +31,22 @@ const VenteValidee = () => {
         }
     }, [currentUser]);
 
-    useEffect(() => {
+    //je crée cette fonction pour le rafraichissement de la liste apres validation ou annulation
+      const fetchVentes = async () => {
+        if (!userid) return;
+        try {
+            const response = await axios.get(`${StaticIP}api/vente/vente_validee/${userid}?page=${currentPage}&limit=${limit}`);
+            setVentes(response.data.ventes);
+            settotalvente(response.data.totalvente);
+            setTotalPages(response.data.totalPages);
+            setCurrentPage(response.data.currentPage);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des ventes :", error);
+        }
+        };
+
+
+      useEffect(() => {
         if (userid) {
           axios.get(`${StaticIP}api/vente/vente_validee/${userid}?page=${currentPage}&limit=${limit}`)
           .then(response => { 
@@ -44,6 +59,7 @@ const VenteValidee = () => {
         })
     }
 }, [userid, currentPage]);
+
 
     
     const goToPage = (page) => {
@@ -66,27 +82,27 @@ const VenteValidee = () => {
             console.error("Erreur d'annulation :", error);
         }
     };
-    const handleValidateVente = async () => {
-        try {
-            await axios.post(`${StaticIP}api/vente/valider/${venteIdToCancel}`);
-            setShowModalvalider(false);
-            toast.success('Vente validée avec succès !');
-            fetchVentes(); // Rafraîchir la liste après validation
-        } catch (error) {
-            console.error("Erreur de validation :", error);
-        }
-    };
+const handleValidateVente = async () => {
+  try {
+    const response = await axios.post(`${StaticIP}api/vente/valider/${venteIdToCancel}`);
+    console.log("Vente validée :", response.data.vente);
+    setShowModalvalider(false);
+    toast.success('Vente validée avec succès !');
+    // Rafraîchir avec current values
+    fetchVentes();
+  } catch (error) {
+    console.error("Erreur de validation :", error);
+  }
+};
+
+
+
 
     const handleViewModif = (id) => {
-        router.push(`/fastfood/ModifierVente/${id}`); // Redirige vers la page ModifierVente avec l'ID
+        router.push(`/fastfood/modifiervente/${id}`); // Redirige vers la page ModifierVente avec l'ID
       };
 
-    //je crée cette fonction pour le rafraichissement de la liste apres validation ou annulation
-      const fetchVentes = async () => {
-        const response = await axios.get(`${StaticIP}api/vente/vente_validee/${userid}`);
-        setVentes(response.data);
-      };
-
+    
       const imprimerRecu = (vente) => {
         const win = window.open('', '_blank', 'width=300,height=600');
         const contenu = `
@@ -151,7 +167,6 @@ const VenteValidee = () => {
         win.print();
         win.close();
       };
-      
 
     return (
         <LayoutFastfood>
@@ -160,7 +175,11 @@ const VenteValidee = () => {
                 <div class="col-xl-12 col-lg-12">
                     <div className="card">
                         <div class="card-header">
-                            <h6>Toutes les ventes </h6>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Link href="/fastfood/Vente" className="btn btn-success">
+                                    <i className='icofont-plus'></i> Nouvelle vente
+                                </Link>
+                            </div>
                         </div>
                         <div class="card-body">
                             <table className="table table-responsive border-collapse border border-gray-200">

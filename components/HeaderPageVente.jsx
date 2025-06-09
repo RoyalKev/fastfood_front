@@ -99,14 +99,14 @@ const HeaderPageVente = () => {
                             <div className='col-lg-3 col-md-3 col-xs-12'>
                                 <div className='card'>
                                     <Link className="btn btn-success" href='/fastfood/VenteValidee'>
-                                    <i className="icofont-shopping-cart"></i> Facture validées 
+                                    <i className="icofont-shopping-cart"></i> Toutes les commandes
                                     </Link>
                                 </div>
                             </div>
                             <div className='col-lg-3 col-md-3 col-xs-12'>
                                 <div className='card'>
                                     <Link className="btn btn-warning" href='/fastfood/VenteEnCours'>
-                                    <i className="icofont-shopping-cart"></i> Facture en cours 
+                                    <i className="icofont-shopping-cart"></i> Commandes en cours 
                                     </Link>
                                 </div>
                             </div>

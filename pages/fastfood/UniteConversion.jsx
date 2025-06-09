@@ -67,36 +67,51 @@ const UniteConversion = () => {
         fetchcategories(categories);
     }, []);
 
+    //flitrer les produits
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const filteredProduits = produits.filter((produit) =>
+        produit.designation.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Récupération des produits avec pagination
-    const fetchproduits = async (page = 1) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${StaticIP}api/uniteconversion/liste?page=${page}&limit=10`);
-            if (response.data.Status) {
-                setproduits(response.data.Result);
-                setTotalPages(response.data.Pagination.totalPages);
-                setCurrentPage(response.data.Pagination.currentPage);
-            } else {
-                setError("Erreur lors de la récupération des produits");
+    const fetchproduits = async (page = 1, search = searchTerm) => {
+    setLoading(true);
+    try {
+        const response = await axios.get(`${StaticIP}api/uniteconversion/liste`, {
+            params: {
+                page,
+                limit: 10,
+                search
             }
-        } catch (err) {
-            setError("Une erreur est survenue lors de la récupération des produits");
-            console.error(err);
-        } finally {
-            setLoading(false);
+        });
+
+        if (response.data.Status) {
+            setproduits(response.data.Result);
+            setTotalPages(response.data.Pagination.totalPages);
+            setCurrentPage(response.data.Pagination.currentPage);
+        } else {
+            setError("Erreur lors de la récupération des produits");
         }
-    };
+    } catch (err) {
+        setError("Une erreur est survenue lors de la récupération des produits");
+        console.error(err);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     useEffect(() => {
-        fetchproduits(currentPage);
-    }, [currentPage]);
+    fetchproduits(1, searchTerm);
+}, [searchTerm]);
 
-    const goToPage = (page) => {
-        if (page > 0 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
+   const goToPage = (page) => {
+    if (page > 0 && page <= totalPages) {
+        fetchproduits(page, searchTerm); // <-- très important
+    }
+};
+
     // Récupération des boissons
     const fetchboissons = async (e) => {
         setLoading(true);
@@ -200,7 +215,7 @@ const UniteConversion = () => {
         /*for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }*/
-        if (image) formData.append('image', image);
+
 
         setLoading(true);
         try {
@@ -310,6 +325,8 @@ const UniteConversion = () => {
             })
     }
 
+    
+
     //FIN MISE A JOUR
     return (
         <LayoutFastfood>
@@ -403,13 +420,7 @@ const UniteConversion = () => {
                                             </div>
                                         }
 
-                                        <div className="col-md-8">
-                                            <label className="form-label">Uploader image<font color="red">*</font></label>
-
-                                            <input type="file" class="form-control"
-                                                name="image"
-                                                onChange={(e) => setImage(e.target.files[0])} />
-                                        </div>
+                                        
                                         <div className="col-md-12">
                                             <button type="submit" className="btn btn-success btn-sm mt-2" disabled={loading}>
                                                 <i className='icofont-save'></i> {loading ? 'Enregistrement en cours...' : 'Enregistrer'}
@@ -425,6 +436,18 @@ const UniteConversion = () => {
 
                 <div class="col-xl-12 col-lg-12">
                     <div class="card">
+                        <div class="card-header">
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <input
+                                    type="text"
+                                    className="form-control mb-3"
+                                    placeholder="Rechercher par désignation..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ width: '30%' }}
+                                />
+                            </div>
+                        </div>
                         <CardTitle title="Liste" />
                         <div class="card-body">
                             {produits.length === 0 ? (
@@ -444,7 +467,7 @@ const UniteConversion = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {produits.map((produit, index) => (
+                                            {filteredProduits.map((produit, index) => (
                                                 <tr key={produit.id}>
                                                     <td>
                                                         {produit.type}
@@ -471,7 +494,7 @@ const UniteConversion = () => {
                                                             onClick={() => handleShowproduit(produit.id)}>
                                                             <i className='icofont-eye' style={{ color: "#cfa108" }}></i>
                                                         </button>
-                                                        <button className="btn btn-outline-danger btn-sm"
+                                                        <button className="btn btn-outline-danger btn-sm" hidden
                                                             title="Supprimer"
                                                             onClick={() => {
                                                                 setselectedproduit(produit);

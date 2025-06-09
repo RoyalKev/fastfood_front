@@ -89,7 +89,7 @@ export default function Dashboard() {
             {
                 currentUser && currentUser.role == "Admin" &&
                 <>
-                    <div class="row g-3 mb-3 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
+                    <div class="row g-3 mb-3 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 row-cols-xl-4" hidden>
                         <div class="col">
                             <div class="alert-success alert mb-0">
                                 <div class="d-flex align-items-center">
