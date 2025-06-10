@@ -222,7 +222,7 @@ const ToutesLesVentes = () => {
                     <Modal.Header closeButton>
                         <Modal.Title>Confirmation</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Voulez-vous vraiment annuler cette vente ?</Modal.Body>
+                    <Modal.Body>Voulez-vous vraiment valider cette vente ?</Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowModalvalider(false)}>
                             Annuler

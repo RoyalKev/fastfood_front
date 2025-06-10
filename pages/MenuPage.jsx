@@ -2,6 +2,8 @@ import { AuthContext } from '@/context/authContext';
 import Link from 'next/link'
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect, useState } from 'react'
+import '@/styles/css/ebazar.style.min.css';
+import '@/styles/css/custom.css';
 
 const MenuPage = () => {
     const { currentUser, logout } = useContext(AuthContext)
@@ -32,111 +34,123 @@ const MenuPage = () => {
                 currentUser && currentUser.role =="Admin" ?
                 <>
                 <div className='row' style={{marginTop:'10px'}}>
-                    <div className='col-lg-3 col-md-3 col-xs-12 mb-2'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-info" href='/fastfood/Dashboard'>
+                            <Link className="btn btn-dark" href='/fastfood/Dashboard'>
                                 <i className="icofont-home"></i> Tableau de bord  vue d'ensemble
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-primary" href='/fastfood/Categorie'>
+                            <Link className="btn btn-dark" href='/fastfood/Categorie'>
                                 <i className="icofont-home"></i> Gestion des Catégories
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-warning" href='/fastfood/Table'>
+                            <Link className="btn btn-dark" href='/fastfood/Table'>
                                 <i className="icofont-home"></i> Gestion des Tables
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
-                        <div className='card'>
-                            <Link className="btn btn-secondary" href='/fastfood/Produit'>
-                                <i className="icofont-home"></i> Aliments sources
-                            </Link>
-                        </div>
-                    </div>
+                    
                 </div>
 
                     <div className='row' style={{marginTop:'10px'}}>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                        <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-primary" href='/fastfood/UniteConversion'>
-                                <i className="icofont-home"></i> Produits à vendre
+                            <Link className="btn btn-dark" href='/fastfood/Produit'>
+                                <i className="icofont-home"></i> Créer/Liste des Aliments sources
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-info" href='/fastfood/Appro'>
-                                <i className="icofont-home"></i> Appro aliment sources
+                            <Link className="btn btn-dark" href='/fastfood/UniteConversion'>
+                                <i className="icofont-home"></i> Produits à vendre (Boissons / Plats)
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-secondary" href='/fastfood/ApproBoissons'>
+                            <Link className="btn btn-dark" href='/fastfood/Appro'>
+                                <i className="icofont-home"></i> Appro. aliment sources
+                            </Link>
+                        </div>
+                    </div>
+                    
+                    </div>
+
+                    <div className='row' style={{marginTop:'10px'}}>
+                        <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
+                        <div className='card'>
+                            <Link className="btn btn-dark" href='/fastfood/ApproBoissons'>
                                 <i className="icofont-home"></i> Approvision. Boissons
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-primary" href='/fastfood/Inventaire'>
+                            <Link className="btn btn-dark" href='/fastfood/Inventaire'>
                                 <i className="icofont-home"></i> Inventaire aliments sources
                             </Link>
                         </div>
                     </div>
-                    </div>
-
-                    <div className='row' style={{marginTop:'10px'}}>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-success" href='/fastfood/Inventaireboisson'>
+                            <Link className="btn btn-dark" href='/fastfood/Inventaireboisson'>
                                 <i className="icofont-home"></i> Inventaire boissons
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
-                        <div className='card'>
-                            <Link className="btn btn-info" href='/fastfood/Utilisateur'>
-                                <i className="icofont-home"></i> Comptes utilisateurs
-                            </Link>
-                        </div>
-                    </div>
+                    
+
                     </div>
 
                         <hr/>
                         <div className='row' style={{marginTop:'10px'}}>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                            <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-primary" href='/fastfood/ProduitSeuil'>
-                                <i className="icofont-home"></i> Produits au seuil de stock
+                            <Link className="btn btn-dark" href='/fastfood/Utilisateur'>
+                                <i className="icofont-users"></i> Comptes utilisateurs
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-secondary" href='/fastfood/Tendances'>
-                                <i className="icofont-home"></i> Tendances pour prévisions
+                            <Link className="btn btn-dark" href='/fastfood/ModifierPassword'>
+                                <i className="icofont-lock"></i> Modifier mot de passe
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-warning" href='/fastfood/VenteDuJour'>
-                                <i className="icofont-home"></i> Récap. des Ventes du jour
+                            <Link className="btn btn-dark" href='/fastfood/ProduitSeuil'>
+                                <i className="icofont-info-circle"></i> Produits au seuil de stock
                             </Link>
                         </div>
                     </div>
-                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                         <div className='card'>
-                            <Link className="btn btn-info" href='/fastfood/ToutesLesVentes'>
-                                <i className="icofont-home"></i> Toutes les ventes
+                            <Link className="btn btn-dark" href='/fastfood/Tendances'>
+                                <i className="icofont-sale-discount"></i> Tendances pour prévisions
+                            </Link>
+                        </div>
+                    </div>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
+                        <div className='card'>
+                            <Link className="btn btn-dark" href='/fastfood/VenteDuJour'>
+                                <i className="icofont-sale-discount"></i> Récap. des Ventes du jour
+                            </Link>
+                        </div>
+                    </div>
+                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
+                        <div className='card'>
+                            <Link className="btn btn-dark" href='/fastfood/ToutesLesVentes'>
+                                <i className="icofont-home"></i> Toutes les commandes
                             </Link>
                         </div>
                     </div>
@@ -145,31 +159,38 @@ const MenuPage = () => {
                 :
                 <div className='row' style={{marginTop:'10px'}}>
                                     
-                                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                                         <div className='card'>
-                                            <Link className="btn btn-primary" href='/fastfood/Vente'>
-                                            <i className="icofont-file-document"></i> Nouvelle vente 
+                                            <Link className="btn btn-dark" href='/fastfood/Vente'>
+                                            <i className="icofont-file-document"></i> Nouvelle commande
                                             </Link>
                                         </div>
                                     </div>
-                                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                                         <div className='card'>
-                                            <Link className="btn btn-success" href='/fastfood/VenteDuJourCaissier'>
+                                            <Link className="btn btn-dark" href='/fastfood/VenteDuJourCaissier'>
                                             <i className="icofont-file-document"></i> Journal caisse 
                                             </Link>
                                         </div>
                                     </div>
-                                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                                         <div className='card'>
-                                            <Link className="btn btn-info" href='/fastfood/VenteValidee'>
-                                            <i className="icofont-shopping-cart"></i> Facture validées 
+                                            <Link className="btn btn-dark" href='/fastfood/VenteValidee'>
+                                            <i className="icofont-shopping-cart"></i> Toutes les commandes 
                                             </Link>
                                         </div>
                                     </div>
-                                    <div className='col-lg-3 col-md-3 col-xs-12'>
+                                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
                                         <div className='card'>
-                                            <Link className="btn btn-warning" href='/fastfood/VenteEnCours'>
-                                            <i className="icofont-shopping-cart"></i> Facture en cours 
+                                            <Link className="btn btn-dark" href='/fastfood/VenteEnCours'>
+                                            <i className="icofont-shopping-cart"></i> Commandes en cours 
+                                            </Link>
+                                        </div>
+                                    </div>
+                                    <div className='col-lg-4 col-md-4 col-xs-12 mt-3'>
+                                        <div className='card'>
+                                            <Link className="btn btn-dark" href='/fastfood/ModifierPassword'>
+                                                <i className="icofont-lock"></i> Modifier mot de passe
                                             </Link>
                                         </div>
                                     </div>

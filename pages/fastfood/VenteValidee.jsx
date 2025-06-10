@@ -104,7 +104,7 @@ const handleValidateVente = async () => {
 
     
       const imprimerRecu = (vente) => {
-        const win = window.open('', '_blank', 'width=300,height=600');
+        const win = window.open('', '_blank', 'width=330,height=600');
         const contenu = `
           <html>
             <head>
@@ -170,7 +170,7 @@ const handleValidateVente = async () => {
 
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="ventes validées" />
+            <BreadCrumb titre="commandes" />
             <div className="row g-3 mb-3">
                 <div class="col-xl-12 col-lg-12">
                     <div className="card">
@@ -214,17 +214,14 @@ const handleValidateVente = async () => {
                                                     </ul>
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>
-                                                    {
-                                                        vente.statut == "Validé" ?
-                                                            <span className='badge bg-success'>{vente.statut}</span> :
-                                                            <span className='badge bg-danger'>{vente.statut}</span>
-                                                    }
-
+                                                    {vente.statut == "Validé" && <span className='badge bg-success'>{vente.statut}</span> }
+                                                    {vente.statut == "En cours" && <span className='badge bg-warning'>{vente.statut}</span> }
+                                                    {vente.statut == "Annulée" && <span className='badge bg-danger'>{vente.statut}</span> }
                                                 </td>
                                                 <td style={{ textAlign: 'center' }}>
                                                     {
                                                         vente.statut == "Validé" &&
-                                                        <button
+                                                        <button hidden
                                                             title="Annuler"
                                                             className="btn btn-danger btn-sm"
                                                             onClick={() => {
@@ -332,7 +329,7 @@ const handleValidateVente = async () => {
                     <Modal.Header closeButton>
                         <Modal.Title>Confirmation</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Voulez-vous vraiment annuler cette vente ?</Modal.Body>
+                    <Modal.Body>Voulez-vous vraiment valider cette vente ?</Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowModalvalider(false)}>
                             Annuler

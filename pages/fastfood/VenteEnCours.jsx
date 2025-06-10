@@ -87,7 +87,7 @@ const VenteEnCours = () => {
 
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="ventes en cours" />
+            <BreadCrumb titre="commandes en cours" />
             <div className="row g-3 mb-3">
                 <div class="col-xl-12 col-lg-12">
                     <div className="card">
@@ -239,7 +239,7 @@ const VenteEnCours = () => {
                     <Modal.Header closeButton>
                         <Modal.Title>Confirmation</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Voulez-vous vraiment annuler cette vente ?</Modal.Body>
+                    <Modal.Body>Voulez-vous vraiment valider cette vente ?</Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowModalvalider(false)}>
                             Annuler

@@ -31,7 +31,7 @@ const Appro = () => {
 
     const fetchProduits = async () => {
         try {
-            const response = await axios.get(`${StaticIP}api/produit/liste`);
+            const response = await axios.get(`${StaticIP}api/produit/liste2`);
             if (response.data.Status) {
                 setProduits(response.data.Result);
             } else {
@@ -143,7 +143,7 @@ const Appro = () => {
 
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="Achats" />
+            <BreadCrumb titre="approvisionnements aliments sources" />
             <div className="row g-3 mb-3">
                 <div class="col-xl-7 col-lg-7">
                     <div className="card">
@@ -182,7 +182,7 @@ const Appro = () => {
 
                 <div class="col-xl-5 col-lg-5">
                     <div class="card">
-                        <CardTitle title="Liste des achats" />
+                        <CardTitle title="Liste des approvisionnements alim.sources" />
                         <div class="card-body">
                             {appro.length === 0 ? (
                                 <p>Aucun appro trouvé.</p>

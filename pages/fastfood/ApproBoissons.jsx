@@ -145,7 +145,7 @@ const ApproBoissons = () => {
 
     return (
         <LayoutFastfood>
-            <BreadCrumb titre="Achats" />
+            <BreadCrumb titre="appro boissons" />
             <div className="row g-3 mb-3">
                 <div class="col-xl-7 col-lg-7">
                     <div className="card">
@@ -183,7 +183,7 @@ const ApproBoissons = () => {
 
                 <div class="col-xl-5 col-lg-5">
                     <div class="card">
-                        <CardTitle title="Liste des achats" />
+                        <CardTitle title="Liste des appro boissons"/>
                         <div class="card-body">
                             {appro.length === 0 ? (
                                 <p>Aucun appro trouvé.</p>
