@@ -18,6 +18,7 @@ const Vente = () => {
   const [selectedTable, setSelectedTable] = useState('');
   const [montantlivraison, setmontantlivraison] = useState(0);
   const [reduction, setreduction] = useState(0);
+  const [nomclient, setNomclient] = useState("");
   useEffect(() => {
     if (venteType === "GOZEM") {
       setmontantlivraison(500);
@@ -143,7 +144,7 @@ const Vente = () => {
       };
 
       const response = await axios.post(`${StaticIP}api/vente/nouveau`, 
-        {venteData, venteType, selectedTable, montantlivraison, reduction});
+        {venteData, venteType, selectedTable, montantlivraison, reduction, nomclient});
 
       if (response.status === 201) {
         toast.success('Vente enregistrée avec succès !');
@@ -378,6 +379,10 @@ const Vente = () => {
                             </select>
                           </div>
                         )}
+                        <div className="mb-3">
+                          <label><b>Nom du client :</b></label>
+                          <input className="form-control" value={nomclient} onChange={(e) => setNomclient(e.target.value)}/>
+                        </div>
                         <div className="mb-3">
                           <label><b>Réduction (en F):</b></label>
                           <input className="form-control" value={reduction} onChange={(e) => setreduction(e.target.value)}/>

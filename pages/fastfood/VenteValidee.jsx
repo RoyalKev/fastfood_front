@@ -101,10 +101,28 @@ const handleValidateVente = async () => {
     const handleViewModif = (id) => {
         router.push(`/fastfood/modifiervente/${id}`); // Redirige vers la page ModifierVente avec l'ID
       };
-
     
-      const imprimerRecu = (vente) => {
+      const imprimerRecu = async (vente) => {
         const win = window.open('', '_blank', 'width=330,height=600');
+        // Charger le logo en base64
+        const getBase64Image = (url) => {
+            return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                resolve(reader.result);
+                };
+                reader.readAsDataURL(xhr.response);
+            };
+            xhr.onerror = reject;
+            xhr.open('GET', url);
+            xhr.responseType = 'blob';
+            xhr.send();
+            });
+        };
+        const logoURL = '/logo.jpeg'; // Dans public/
+        const logoBase64 = await getBase64Image(logoURL);
         const contenu = `
           <html>
             <head>
@@ -129,12 +147,23 @@ const handleValidateVente = async () => {
                   display: flex;
                   justify-content: space-between;
                 }
+                .logo {
+                    height: 135px;
+                }
+                .logozone{
+                    margin-top: -35px;
+                }
               </style>
             </head>
             <body>
+
+              <div class="center logozone bold">
+                <img src="${logoBase64}" class="logo" />
+              </div>
               <div class="center bold">MALUMBI RESTAURANT BAR</div>
               <div class="center bold">Tél : 065 75 63 07</div>
               <hr />
+              <div class="ligne"><span>Nom du client:</span><span>${vente.nomclient}</span></div>
               <div class="ligne"><span>Date:</span><span>${new Date(vente.date).toLocaleString()}</span></div>
               <div class="ligne"><span>Vente:</span><span>#${vente.numero}</span></div>
               <div class="ligne"><span>Type:</span><span>${vente.type_vente}</span></div>
@@ -157,7 +186,7 @@ const handleValidateVente = async () => {
               <div class="ligne"><span>Réduction:</span><span>${vente.reduction.toLocaleString()} F CFA</span></div>
               <div class="ligne bold"><span>Total:</span><span>${vente.montant.toLocaleString()} F CFA</span></div>
               <hr />
-              <div class="center">Merci pour votre achat !</div>
+              <div class="center">Merci d'être passé. À bientôt !</div>
             </body>
           </html>
         `;
@@ -185,7 +214,7 @@ const handleValidateVente = async () => {
                             <table className="table table-responsive border-collapse border border-gray-200">
                                 <thead>
                                     <tr className="bg-gray-100">
-                                        <th className="border p-2">N°</th>
+                                        <th className="border p-2">N° /Client</th>
                                         <th className="border p-2">Type vente</th>
                                         <th className="border p-2">Date</th>
                                         <th className="border p-2">Table</th>
@@ -199,7 +228,7 @@ const handleValidateVente = async () => {
                                     {ventes.length > 0 ? (
                                         ventes.map((vente) => (
                                             <tr key={vente.id} className="border-b">
-                                                <td>{vente.numero}</td>
+                                                <td>{vente.numero} <br/> {vente.nomclient}</td>
                                                 <td style={{textAlign:'center'}}>{vente.type_vente}</td>
                                                 <td className="border p-2">{new Date(vente.date).toLocaleDateString()}</td>
                                                 <td  className="border p-2"> <font color="red">{vente.table ? `${vente.table.reference} - ${vente.table.emplacement}` : ''}</font></td>

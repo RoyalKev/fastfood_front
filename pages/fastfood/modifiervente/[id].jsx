@@ -35,6 +35,7 @@ const ModifierVente = () => {
                 setSelectedTable(response.data.table_id)
                 setmontantlivraison(response.data.montantlivraison)
                 setreduction(response.data.reduction)
+                setNomclient(response.data.nomclient)
                 setTabledata(response.data.table)
                 console.log(tabledata)
                 //settotalvente(response.data.totalvente);
@@ -69,6 +70,7 @@ const ModifierVente = () => {
     const [selectedTable, setSelectedTable] = useState('');
     const [montantlivraison, setmontantlivraison] = useState(0);
     const [reduction, setreduction] = useState(0);
+    const [nomclient, setNomclient] = useState("");
     useEffect(() => {
         if (venteType === "GOZEM") {
             setmontantlivraison(500);
@@ -191,7 +193,7 @@ const ModifierVente = () => {
                 })),
             };
             const response = await axios.put(`${StaticIP}api/vente/modifier/${id}`, 
-                { venteData, venteType, selectedTable, montantlivraison, reduction });
+                { venteData, venteType, selectedTable, montantlivraison, reduction, nomclient });
             if (response.status === 201) {
                 toast.success('Vente modifiée avec succès !');
                 setCart([]);
@@ -425,6 +427,10 @@ const ModifierVente = () => {
                                                     </select>
                                                 </div>
                                             )}
+                                            <div className="mb-3">
+                                                <label>Nom du client :</label>
+                                                <input className="form-control" value={nomclient} onChange={(e) => setNomclient(e.target.value)}/>
+                                            </div>
                                             <div className="mb-3">
                                                 <label>Réduction :</label>
                                                 <input className="form-control" value={reduction} onChange={(e) => setreduction(e.target.value)}/>
