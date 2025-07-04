@@ -103,7 +103,6 @@ const handleValidateVente = async () => {
       };
     
       const imprimerRecu = async (vente) => {
-        const win = window.open('', '_blank', 'width=330,height=600');
         // Charger le logo en base64
         const getBase64Image = (url) => {
             return new Promise((resolve, reject) => {
@@ -123,6 +122,7 @@ const handleValidateVente = async () => {
         };
         const logoURL = '/logo.jpeg'; // Dans public/
         const logoBase64 = await getBase64Image(logoURL);
+        const win = window.open('', '_blank', 'width=330,height=600');
         const contenu = `
           <html>
             <head>
@@ -192,9 +192,13 @@ const handleValidateVente = async () => {
         `;
         win.document.write(contenu); 
         win.document.close();
-        win.focus();
-        win.print();
-        win.close();
+        win.onload = () => {
+            
+            win.focus();
+            win.print();
+            win.close();
+            
+        };
       };
 
     return (
